@@ -1,0 +1,32 @@
+\usetikzlibrary{arrows,shapes}
+
+\begin{figure}
+\centering
+\begin{tikzpicture}[auto,node distance=1cm]
+
+    \node[codelabel] (start) {\texttt{\_start}};
+    \node[codepart] (setup-regs) [below of=start] {Register setup};
+    \node[codepart] (setup-io) [below of=setup-regs] {I/O setup};
+    \node[codepart] (setup-int) [below of=setup-io] {Interrupt setup};
+    \node[codelabel] (mainloop) [below of=setup-int] {\texttt{mainloop}};
+    \node[codepart] (leds) [below of=mainloop] {Set LEDs};
+    \node[guide] (leds-left) [left of=leds] {};
+    \node[codepart] (sleep) [below of=leds] {Put CPU to sleep};
+
+    \path[->] (start) edge (setup-regs);
+    \path[->] (setup-regs) edge (setup-io);
+    \path[->] (setup-io) edge (setup-int);
+    \path[->] (setup-int) edge (mainloop);
+    \path[->] (mainloop) edge (leds);
+    \path[->] (leds) edge (sleep);
+
+    \draw[->]
+        (sleep.south)
+        -- +(0,-0.25)
+        -| (sleep.west)
+        |- (mainloop.west);
+
+\end{tikzpicture}
+\caption{Main program flow}
+\label{fig:programflow}
+\end{figure}
