@@ -19,7 +19,7 @@ writing the interrupt routine before the button handling code.
 
 \subsection{Hardware setup and toolchain usage}
 
-To set up the board, the jumpers were set to their given values and IO
+To set up the board, the jumpers were set to their given values and I/O
 cables were connected to the LED and button pins, all as according to
 the compendium. The board was connected to the JTAGICE debugging device
 with the appropriate connector, while the JTAGICE in turn was connected
@@ -31,13 +31,13 @@ utility \texttt{make}. \texttt{make} then took care of calling the
 required programs -- the AS assembler, the LD linker and the
 microcontroller programmer utility \texttt{avr32program}.
 
-\subsection{IO setup and LED control}
+\subsection{I/O setup and LED control}
 
 Our first exercise in the code was to get the LEDs to light up. This
 required us to learn the workings of the GPIO model of the STK1000
 board.
 
-As instructed by the compendium \cite{comp}, the IO ports are controlled
+As instructed by the compendium \cite{comp}, the I/O ports are controlled
 and accessed by addressing into memory space indicated by the
 \texttt{AVR32\_PIOB} and \texttt{AVR32\_PIOC} constants. However, we
 quickly realized that these 32-bit addresses would not fit as immediate
@@ -55,8 +55,8 @@ instruction, for instance like this: \texttt{lddpc r0, piob}.
 \texttt{lddpc} means to load a value into a register from a memory
 location given as a displacement to the program counter \cite{avr32}.
 
-Once the base addresses for the IO control fields were loaded into a
-register, the actual setup of the LED IO pins was a matter of storing
+Once the base addresses for the I/O control fields were loaded into a
+register, the actual setup of the LED I/O pins was a matter of storing
 the correct values into these fields.
 
 \subsection{Interrupt handling}
@@ -93,7 +93,7 @@ accordingly. The resulting interrupt routine is sketched out in figure
 
 As detailed in the next chapter, our interrupt routine starts with a
 wait loop to avoid bouncing effects on the buttons. Afterwards, the
-routine reads PIOB's (the IO port connected to the buttons) Interrupt
+routine reads PIOB's (the I/O port connected to the buttons) Interrupt
 State Register, to determine which button generated the interrupt. The
 code then proceeds to separate sections for the left and right button
 accordingly. These sections of the code perform the same kinds of steps,
@@ -112,7 +112,7 @@ After these checks, the interrupt routine is ready to move the light.
 This is done by shifting the value of a register dedicated for this
 purpose, \texttt{r12}. (A full listing of the registers used is provided
 in table \ref{tab:registers}.) Note that the interrupt handler only
-changes the value of this register, not the actual values on the IO
+changes the value of this register, not the actual values on the I/O
 pins. This is left for the main loop, as we shall see soon.
 
 \input{figures/registers}
@@ -122,9 +122,9 @@ pins. This is left for the main loop, as we shall see soon.
 All that remained after a finished interrupt routine, was a main part of
 the program that interacted with the interrupt routine properly. As
 already implemented, the program started with initialization of
-registers, setup of IO (LEDs and button) and setup of interrupt
+registers, setup of I/O (LEDs and button) and setup of interrupt
 handling. In addition to this, the program was supplied with a main
-loop. Its only task was to update the LED IO pins accoring to the LED
+loop. Its only task was to update the LED I/O pins accoring to the LED
 setup register \texttt{r12}.
 
 However, we didn't want the CPU to continually do this update in an
