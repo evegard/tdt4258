@@ -33,7 +33,7 @@
         {Return from interrupt handler (\texttt{rete})};
 
 
-    \path[->] (start) edge (sleeploop);
+    \path[->] (handler) edge (sleeploop);
     \path[->] (sleeploop) edge (isr);
     \path[->] (isr) edge (left);
     \path[->] (left) edge (left-buttonchk);
@@ -49,5 +49,5 @@
 
 \end{tikzpicture}
 \caption{Program flow in interrupt handler}
-\label{fig:programflow}
+\label{fig:interruptflow}
 \end{figure}
