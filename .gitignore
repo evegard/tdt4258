@@ -1,3 +1,5 @@
 *.pdf
 *.log
 *.tex~
+*.aux
+.*.swp
