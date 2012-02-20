@@ -1,4 +1,4 @@
-\section{Description and Methodology}
+\section{Description and methodology}
 
 As described by the task description in the compendium \cite{comp}, a
 recommended step-by-step approach to this exercise was as follows:
@@ -52,7 +52,22 @@ code, the compiler would take care of calculating these offsets.
 Thus, after having defined the constants with e.g. \texttt{piob: .int
 AVR32\_POIB}, they could then be accessed by using the \texttt{lddpc}
 instruction, for instance like this: \texttt{lddpc r0, piob}.
-\texttt{lddpc} means :wq
+\texttt{lddpc} means to load a value into a register from a memory
+location given as a displacement to the program counter \cite{avr32}.
+
+Once the base addresses for the IO control fields were loaded into a
+register, the actual setup of the LED IO pins was a matter of storing
+the correct values into these fields.
+
+\subsection{Interrupt handling}
+
+Next, we attacked the problem of setting up an interrupt handler. The
+compendium contained a thorough description of how this is done
+\cite{comp}. The main steps are reiterated here:
+
+\begin{itemize}
+    \item 
+\end{itemize}
 
 \input{figures/mainflow}
 \input{figures/interruptflow}
