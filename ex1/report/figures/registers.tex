@@ -1,0 +1,17 @@
+\begin{figure}
+\centering
+\begin{tabular}{ c | l }
+    \hline \hline
+    \textsc{Register} & \textsc{Usage} \\ \hline
+    \texttt{r0} &       Base address for IO port B (\texttt{PIOB}). \\
+    \texttt{r1} &       Base address for IO port C (\texttt{PIOC}). \\
+    \texttt{r2} &       Base address for interrupt control register
+                        (\texttt{INTC}). \\
+    \texttt{r8} &       Scratch register 1. \\
+    \texttt{r9} &       Scratch register 2. \\
+    \texttt{r11} &      Constantly 0xff (to save a few instructions). \\
+    \texttt{r12} &      The current LED setup (in bits 0-7). \\
+\end{tabular}
+\caption{Overview of register usage}
+\label{tab:Registers}
+\end{figure}
