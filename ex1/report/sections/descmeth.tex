@@ -1,5 +1,58 @@
 \section{Description and Methodology}
 
+As described by the task description in the compendium, a recommended
+step-by-step approach to this exercise was as follows:
+
+\begin{enumerate}
+    \item Setting up and connecting the STK1000 board.
+    \item Downloading the skeleton code and then compiling, uploading
+    and debugging this code.
+    \item Expanding the skeleton code with code to turn on the LEDs.
+    \item Writing code to read the values of the buttons.
+    \item Further expanding the program with an interrupt handler.
+    \item Modifying the interrupt handler to do the work of reading the
+    buttons and changing the LED values accordingly.
+\end{enumerate}
+
+This is more or less the approach we went with, with the exception of
+writing the interrupt handler before the button handling code.
+
+\subsection{Hardware setup and toolchain usage}
+
+To set up the board, the jumpers were set to their given values and IO
+cables were connected to the LED and button pins, all as according to
+the compendium. The board was connected to the JTAGICE debugging device
+with the appropriate connector, while the JTAGICE in turn was connected
+to the computer with a USB cable.
+
+Compiling the skeleton code, and also our own code as the development
+progressed, was done using the supplied \emph{makefile} with the
+utility \texttt{make}. \texttt{make} then took care of calling the
+required programs -- the AS assembler, the LD linker and the
+microcontroller programmer utility \texttt{avr32program}.
+
+\subsection{IO setup and LED control}
+
+Our first exercise in the code was to get the LEDs to light up. This
+required us to learn the workings of the GPIO model of the STK1000
+board.
+
+As instructed by the compendium, the IO ports are controlled and
+accessed by addressing into memory space indicated by the
+\texttt{AVR32\_PIOB} and \texttt{AVR32\_PIOC} constants. However, we
+quickly realized that these 32-bit addresses would not fit as immediate
+values in any instruction for a 32-bit RISC platform.
+
+To accomodate these large addresses, they would need to be stored
+together with the program code in the object files and thus in memory
+when run, such that they would be accessible at a pre-calculated offset
+from the program counter. By labelling the data values in the assembly
+code, the compiler would take care of calculating these offsets.
+
+Thus, after having defined the constants with e.g. \texttt{piob: .int
+AVR32\_POIB}, they could then be accessed by using the \texttt{lddpc}
+instruction, for instance like this: \texttt{lddpc r0, piob}.
+
 \input{figures/mainflow}
 \input{figures/interruptflow}
 \input{figures/registers}
