@@ -9,23 +9,23 @@
     \node[codepart] (isr) [below of=sleeploop]
         {Read Interrupt State Register};
 
-    \node[codelabel] (left) [below of=isr,xshift=-2.5cm]
+    \node[codelabel] (left) [below of=isr,xshift=-3cm]
         {\texttt{interrupt\_button\_left}};
     \node[codepart] (left-buttonchk) [below of=left]
         {Check left button};
     \node[codepart] (left-ledchk) [below of=left-buttonchk]
         {Check LED position};
     \node[codepart] (left-shift) [below of=left-ledchk]
-        {Shift LED left};
+        {Shift LED setup register left};
 
-    \node[codelabel] (right) [below of=isr,xshift=2.5cm]
+    \node[codelabel] (right) [below of=isr,xshift=3cm]
         {\texttt{interrupt\_button\_right}};
     \node[codepart] (right-buttonchk) [below of=right]
         {Check right button};
     \node[codepart] (right-ledchk) [below of=right-buttonchk]
         {Check LED position};
     \node[codepart] (right-shift) [below of=right-ledchk]
-        {Shift LED right};
+        {Shift LED setup register right};
 
     \node[codelabel] (end) [below of=isr,yshift=-4cm]
         {\texttt{interrupt\_end}};
