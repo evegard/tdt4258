@@ -1,7 +1,7 @@
 \section{Description and Methodology}
 
-As described by the task description in the compendium, a recommended
-step-by-step approach to this exercise was as follows:
+As described by the task description in the compendium \cite{comp}, a
+recommended step-by-step approach to this exercise was as follows:
 
 \begin{enumerate}
     \item Setting up and connecting the STK1000 board.
@@ -37,8 +37,8 @@ Our first exercise in the code was to get the LEDs to light up. This
 required us to learn the workings of the GPIO model of the STK1000
 board.
 
-As instructed by the compendium, the IO ports are controlled and
-accessed by addressing into memory space indicated by the
+As instructed by the compendium \cite{comp}, the IO ports are controlled
+and accessed by addressing into memory space indicated by the
 \texttt{AVR32\_PIOB} and \texttt{AVR32\_PIOC} constants. However, we
 quickly realized that these 32-bit addresses would not fit as immediate
 values in any instruction for a 32-bit RISC platform.
@@ -52,6 +52,7 @@ code, the compiler would take care of calculating these offsets.
 Thus, after having defined the constants with e.g. \texttt{piob: .int
 AVR32\_POIB}, they could then be accessed by using the \texttt{lddpc}
 instruction, for instance like this: \texttt{lddpc r0, piob}.
+\texttt{lddpc} means :wq
 
 \input{figures/mainflow}
 \input{figures/interruptflow}
