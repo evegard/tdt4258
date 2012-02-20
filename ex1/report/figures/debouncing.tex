@@ -1,0 +1,18 @@
+\begin{figure}
+\centering
+\lstset{language=[Motorola68k]Assembler,basicstyle=\ttfamily,numbers=left,firstnumber=86}
+\begin{lstlisting}
+        /* The interrupt handler. */
+interrupt_handler:
+        /* Loop 1000 times to avoid bouncing. */
+        mov r8, 1000
+interrupt_handler_sleep_start:
+        sub r8, 1
+        cp.w r8, 0
+        breq interrupt_handler_sleep_end
+        rjmp interrupt_handler_sleep_start
+interrupt_handler_sleep_end:
+\end{lstlisting}
+\caption{Delay loop for debouncing in the interrupt routine}
+\label{lst:debouncing}
+\end{figure}
