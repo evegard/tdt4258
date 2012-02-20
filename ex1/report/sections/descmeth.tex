@@ -112,11 +112,29 @@ After these checks, the interrupt routine is ready to move the light.
 This is done by shifting the value of a register dedicated for this
 purpose, \texttt{r12}. (A full listing of the registers used is provided
 in table \ref{tab:registers}.) Note that the interrupt handler only
-changes the value of this registert, not the actual values on the IO
+changes the value of this register, not the actual values on the IO
 pins. This is left for the main loop, as we shall see soon.
 
 \input{figures/registers}
 
 \subsection{Main program loop}
+
+All that remained after a finished interrupt routine, was a main part of
+the program that interacted with the interrupt routine properly. As
+already implemented, the program started with initialization of
+registers, setup of IO (LEDs and button) and setup of interrupt
+handling. In addition to this, the program was supplied with a main
+loop. Its only task was to update the LED IO pins accoring to the LED
+setup register \texttt{r12}.
+
+However, we didn't want the CPU to continually do this update in an
+endless loop. Therefore, we \emph{put the CPU to sleep} at the end of
+the main loop. This would halt the CPU's execution of the code until
+otherwise woken up by e.g. an interrupt. This was exactly the behaviour
+we wanted, as we wanted the mainloop to update the LEDs after an
+interrupt.
+
+See figure \ref{fig:mainflow} for the program flow in the main part of
+the program.
 
 \input{figures/mainflow}
