@@ -1,0 +1,53 @@
+\usetikzlibrary{arrows,shapes}
+
+\begin{figure}
+\centering
+\begin{tikzpicture}[auto,node distance=1cm]
+
+    \node[codelabel] (handler) {\texttt{interrupt\_handler}};
+    \node[codepart] (sleeploop) [below of=handler] {Debouncing sleep loop};
+    \node[codepart] (isr) [below of=sleeploop]
+        {Read Interrupt State Register};
+
+    \node[codelabel] (left) [below of=isr,xshift=-2.5cm]
+        {\texttt{interrupt\_button\_left}};
+    \node[codepart] (left-buttonchk) [below of=left]
+        {Check left button};
+    \node[codepart] (left-ledchk) [below of=left-buttonchk]
+        {Check LED position};
+    \node[codepart] (left-shift) [below of=left-ledchk]
+        {Shift LED left};
+
+    \node[codelabel] (right) [below of=isr,xshift=2.5cm]
+        {\texttt{interrupt\_button\_right}};
+    \node[codepart] (right-buttonchk) [below of=right]
+        {Check right button};
+    \node[codepart] (right-ledchk) [below of=right-buttonchk]
+        {Check LED position};
+    \node[codepart] (right-shift) [below of=right-ledchk]
+        {Shift LED right};
+
+    \node[codelabel] (end) [below of=isr,yshift=-4cm]
+        {\texttt{interrupt\_end}};
+    \node[codepart] (rete) [below of=end]
+        {Return from interrupt handler (\texttt{rete})};
+
+
+    \path[->] (start) edge (sleeploop);
+    \path[->] (sleeploop) edge (isr);
+    \path[->] (isr) edge (left);
+    \path[->] (left) edge (left-buttonchk);
+    \path[->] (left-buttonchk) edge (left-ledchk);
+    \path[->] (left-ledchk) edge (left-shift);
+    \path[->] (left-shift) edge (end);
+    \path[->] (isr) edge (right);
+    \path[->] (right) edge (right-buttonchk);
+    \path[->] (right-buttonchk) edge (right-ledchk);
+    \path[->] (right-ledchk) edge (right-shift);
+    \path[->] (right-shift) edge (end);
+    \path[->] (end) edge (rete);
+
+\end{tikzpicture}
+\caption{Program flow in interrupt handler}
+\label{fig:programflow}
+\end{figure}
