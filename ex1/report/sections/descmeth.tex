@@ -9,13 +9,13 @@ recommended step-by-step approach to this exercise was as follows:
     and debugging this code.
     \item Expanding the skeleton code with code to turn on the LEDs.
     \item Writing code to read the values of the buttons.
-    \item Further expanding the program with an interrupt handler.
-    \item Modifying the interrupt handler to do the work of reading the
+    \item Further expanding the program with an interrupt routine.
+    \item Modifying the interrupt routine to do the work of reading the
     buttons and changing the LED values accordingly.
 \end{enumerate}
 
 This is more or less the approach we went with, with the exception of
-writing the interrupt handler before the button handling code.
+writing the interrupt routine before the button handling code.
 
 \subsection{Hardware setup and toolchain usage}
 
@@ -50,7 +50,7 @@ from the program counter. By labelling the data values in the assembly
 code, the compiler would take care of calculating these offsets.
 
 Thus, after having defined the constants with e.g. \texttt{piob: .int
-AVR32\_POIB}, they could then be accessed by using the \texttt{lddpc}
+AVR32\_PIOB}, they could then be accessed by using the \texttt{lddpc}
 instruction, for instance like this: \texttt{lddpc r0, piob}.
 \texttt{lddpc} means to load a value into a register from a memory
 location given as a displacement to the program counter \cite{avr32}.
@@ -61,13 +61,28 @@ the correct values into these fields.
 
 \subsection{Interrupt handling}
 
-Next, we attacked the problem of setting up an interrupt handler. The
+Next, we attacked the problem of setting up an interrupt routine. The
 compendium contained a thorough description of how this is done
 \cite{comp}. The main steps are reiterated here:
 
 \begin{itemize}
-    \item 
+    \item Point the \texttt{EVBA} system register to the address of the
+    interrupt routine.
+    \item Set the \emph{autovector} (offset) for interrupts from PIOB to
+    0, as \texttt{EVBA} already points to our desired interrupt routine.
+    \item Read PIOB's Interrupt Status Register (\texttt{ISR}) to clear
+    any pending interrupts.
+    \item Enable interrupts in the CPU using the \texttt{csrf 14}
+    instruction (clear CPU status flag 14, which disables interrupts).
 \end{itemize}
+
+This was in addition to actually writing the interrupt routine. This
+routine in itself was quite straight-forward to implement. We didn't use
+any "unsafe" registers, so there was no need to use the stack. The
+interrupt routine was thus just a regular routine with a \texttt{rete}
+instruction at the end.
+
+\subsection{Responding to buttons}
 
 \input{figures/mainflow}
 \input{figures/interruptflow}
