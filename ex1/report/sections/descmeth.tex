@@ -84,6 +84,39 @@ instruction at the end.
 
 \subsection{Responding to buttons}
 
-\input{figures/mainflow}
+After making sure the interrupt routine functioned as intended, we
+filled it in with code for reading the button pins and responding
+accordingly. The resulting interrupt routine is sketched out in figure
+\ref{fig:interruptflow}.
+
 \input{figures/interruptflow}
+
+As detailed in the next chapter, our interrupt routine starts with a
+wait loop to avoid bouncing effects on the buttons. Afterwards, the
+routine reads PIOB's (the IO port connected to the buttons) Interrupt
+State Register, to determine which button generated the interrupt. The
+code then proceeds to separate sections for the left and right button
+accordingly. These sections of the code perform the same kinds of steps,
+but suited to their corresponding buttons and directions.
+
+First, the data pin for the button is checked to see whether the button
+is pushed down. This is needed because an interrupt is generated both
+when a button is pressed and released. If the button is not pushed down,
+the code skips to \texttt{interrupt\_end}.
+
+The code then checks that shifting the LED is possible. That is, if the
+LED is already at the edge of the row of lights, the code aborts to
+\texttt{interrupt\_end}.
+
+After these checks, the interrupt routine is ready to move the light.
+This is done by shifting the value of a register dedicated for this
+purpose, \texttt{r12}. (A full listing of the registers used is provided
+in table \ref{tab:registers}.) Note that the interrupt handler only
+changes the value of this registert, not the actual values on the IO
+pins. This is left for the main loop, as we shall see soon.
+
 \input{figures/registers}
+
+\subsection{Main program loop}
+
+\input{figures/mainflow}
