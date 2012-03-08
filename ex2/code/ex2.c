@@ -9,10 +9,35 @@
 
 #include "ex2.h"
 
+static double *notes;
+
+void initNotes()
+{
+    int note_count = 12, i;
+    notes = malloc(note_count * sizeof(double));
+    for (i = 0; i < note_count; i++) {
+        notes[i] = 440 * pow(2, (i - 9) / 12.0);
+    }
+}
+
+#define C       0
+#define C_SHARP 1
+#define D       2
+#define D_SHARP 3
+#define E       4
+#define F       5
+#define F_SHARP 6
+#define G       7
+#define G_SHARP 8
+#define A       9
+#define A_SHARP 10
+#define B       11
+
 volatile avr32_pio_t *piob = &AVR32_PIOB;
 
 
 int main (int argc, char *argv[]) {
+  initNotes();
   initHardware();
 
   while(1);
@@ -93,6 +118,8 @@ void initAudio(void) {
     dac->IER.tx_ready = 1;
 }
 
+int freq = 220;
+
 void button_isr(void)
 {
     /* Do debouncing before reading the data pins. */
@@ -105,23 +132,7 @@ void button_isr(void)
     int i, j;
     for (i = 0; i < 8; i++) {
         if ((isr & (1 << i)) && (~pdsr & (1 << i))) {
-            if (i == 0) {
-                for (j = 1; j < 8; j++) {
-                    if (get_led(j)) {
-                        set_led(j, 0);
-                        set_led(j-1, 1);
-                        return;
-                    }
-                }
-            } else if (i == 2) {
-                for (j = 0; j < 7; j++) {
-                    if (get_led(j)) {
-                        set_led(j, 0);
-                        set_led(j+1, 1);
-                        return;
-                    }
-                }
-            }
+            freq = notes[i];
         }
     }
 }
@@ -129,17 +140,30 @@ void button_isr(void)
 int step = 0;
 int rate = 46875 >> 3;
 int amp = 65535;
-int freq = 440;
+
+double sin_lookup(double x)
+{
+    static double *lookup;
+    static const int length = 720;
+    int i;
+
+    if (lookup == NULL) {
+        lookup = malloc(length * sizeof(double));
+        for (i = 0; i < length; i++) {
+            lookup[i] = sin(i * (2*M_PI) / length);
+        }
+    }
+
+    return lookup[(int)((x - ((int)(x/(2*M_PI)))*(2*M_PI)) * length / (2*M_PI))];
+}
 
 void abdac_isr(void)
 {
     volatile avr32_abdac_t *dac = &AVR32_ABDAC;
-    //dac->SDR.channel0 = (short)(sin(step * 2 * 3.14 * freq / rate) * amp);
-    //dac->SDR.channel1 = (short)(sin(step * 2 * 3.14 * freq / rate) * amp);
-    dac->SDR.channel0 = (short)(step < rate/2 ? 1 : 0)*10000;
-    dac->SDR.channel0 = (short)(step < rate/2 ? 1 : 0)*10000;
+    dac->SDR.channel0 = (short)(sin_lookup(step * (2*M_PI) * freq / rate) * amp / 10);
+    dac->SDR.channel1 = (short)(sin_lookup(step * (2*M_PI) * freq / rate) * amp / 10);
 
     step++;
-    if (step >= rate)
+    if (step * freq >= rate)
         step = 0;
 }
