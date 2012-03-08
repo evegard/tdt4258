@@ -12,7 +12,7 @@
 static double *notes;
 
 int step = 0;
-int rate = 46875 >> 3;
+int rate = 46875;
 int amp = 65535 / 10;
 
 short *snd_buffer = { 0 };
@@ -30,7 +30,7 @@ short* snd_note_buffer(double frequency)
     int i;
 
     for (i = 0; i < len; i++) {
-        buffer[i] = sin(i * 2 * M_PI / len);
+        buffer[i] = sin(i * 2 * M_PI / len) * amp;
     }
 
     return buffer;
@@ -146,8 +146,6 @@ void initAudio(void) {
     dac->IER.tx_ready = 1;
 }
 
-int freq = 220;
-
 void button_isr(void)
 {
     /* Do debouncing before reading the data pins. */
@@ -160,7 +158,6 @@ void button_isr(void)
     int i;
     for (i = 0; i < 8; i++) {
         if ((isr & (1 << i)) && (~pdsr & (1 << i))) {
-            freq = notes[i];
         }
     }
 }
@@ -190,7 +187,7 @@ void abdac_isr(void)
     }
 
     dac->SDR.channel0 = snd_buffer[step];
-    dac->SDR.channel0 = snd_buffer[step];
+    dac->SDR.channel1 = snd_buffer[step];
 
     step++;
 }
