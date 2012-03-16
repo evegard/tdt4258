@@ -16,6 +16,19 @@
 #define A_SHARP 11
 #define B       12
 
+#define C5       13
+#define C5_SHARP 14
+#define D5       15
+#define D5_SHARP 16
+#define E5       17
+#define F5       18
+#define F5_SHARP 19
+#define G5       20
+#define G5_SHARP 21
+#define A5       22
+#define A5_SHARP 23
+#define B5       24
+
 extern int *mel_notes;
 extern int *mel_notelens;
 extern int mel_size;
