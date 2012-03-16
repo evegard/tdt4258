@@ -1,3 +1,5 @@
+#include <avr32/ap7000.h>
+
 #include "led.h"
 
 int led_setup = 0;

@@ -1,8 +1,6 @@
 #ifndef MELODY_H
 #define MELODY_H
 
-#include <avr32/ap7000.h>
-
 #define C       1
 #define C_SHARP 2
 #define D       3
