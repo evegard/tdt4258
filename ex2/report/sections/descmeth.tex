@@ -88,3 +88,17 @@ of the eight buttons in a \texttt{for} loop. When a button is pushed,
 \subsection{Playing Sound Samples}
 \subsection{Playing Melodies}
 \subsection{Ideas for Improvement}
+
+\begin{comment}
+Vi burde kommentere litt om math.h, M\_2\_PI-moroa, samt problemer med
+lydgenereringen. Også kommentere at sinus er alt for treg til å kunne
+brukes direkte. 
+
+Tidligere hadde vi problemer med å regne ut toner og lignende, og vi var
+usikre på hvorfor vi fikk spraking o.l. Vi prøvde også å sette ned
+raten, og det fungerte av ukjente grunner.  Det viser seg at en
+kombinasjon av approksimasjoner av sinus samt mye multiplikasjon gjorde
+interrupt-handleren tregere enn det vi trodde - og det å sette ned raten
+gjorde det mulig interrupt-handleren å produsere lyden vi ønsket, men
+med en dårligere kvalitet.
+\end{comment}
