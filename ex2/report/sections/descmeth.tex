@@ -81,24 +81,62 @@ Button handling is also similar to the assembly code in the previous
 exercise. \texttt{btn\_init} initializes the I/O pins for input and
 registers \texttt{btn\_interrupt} as the interrupt routine for button
 changes. \texttt{btn\_interrupt} is an extended version of the interrupt
-routine in the previous exercise, by checking the status of \emph{all}
-of the eight buttons in a \texttt{for} loop. When a button is pushed,
+routine in the previous exercise, checking the status of \emph{all} of
+the eight buttons in a \texttt{for} loop. When a button is pushed,
 \texttt{mel\_set\_melody} is called to change the melody.
 
 \subsection{Playing Sound Samples}
+
+\subsubsection{ABDAC Setup}
+To generate sound, the ABDAC first needs to be set up. As outlined in
+the beginning of the chapter, there are several steps in doing this.
+
+First, the I/O pins shared with the ABDAC module, pins 20 and 21 on port
+B, need to be relinquished. This is done by setting the corresponding
+bits in PIOB's \texttt{PDR} (PIO Disable Register) and \texttt{ASR}
+(Peripheral A Select Register) registers.
+
+Next, the ABDAC needs a clock source to time the samples. This is
+supplied by a \emph{Power Manager} on the chip. The Power Manager has
+several configurable generic clocks, and the ABDAC is connected to clock
+number 6. To configure this clock output, we need to specify an internal
+clock source and an optional frequency divisor. In our program, we use
+oscillator 0 and no frequency divison. This gives a clock rate of 20
+MHz. \cite{ap7000}
+
+Lastly, we need to specify an interrupt routine supplying the samples
+(\texttt{snd\_interrupt}), and then the ABDAC needs to be activated.
+This is done by setting two flags in the ABDAC registers.
+
+These initialization steps are all contained in the function
+\texttt{snd\_init}.
+
+The ABDAC will, after activation, trigger the interrupt routine
+\texttt{snd\_interrupt} every time it needs a new sample. The sample
+rate of the ABDAC is the rate of the clock source divided by 256. In our
+case, the sample rate is $\frac{20000000 Hz}{256}=78125 Hz$.
+
+\subsubsection{Supplying Sound Samples}
+To begin with, we only supplied random data for the sample values. This
+allowed us to verify a working ABDAC before implementing sounds.
+Afterwards, we moved on to implementing sinusoidal sound waves -- sound
+waves based on sine values.
+
+Experimentation showed us that evaluating the \texttt{sin} function in
+the interrupt routine was too slow. An initial attempt at alleviating
+this, was to use a lookup table for the sine values. However, this
+optimization was also insufficient. The interrupt routine would still
+need to do multiplications and divisions to get the appropriate sample,
+and this was too slow.
+
+Our solution is to \emph{precalculate} all of the samples needed for a
+cycle/wavelength of the current sound wave. These samples are put in a
+\emph{sound buffer}. The interrupt routine only needs to maintain a step
+counter, read into the sound buffer correspondingly and return these
+values. The interrupt routine is left as a quick buffer lookup, and the
+code for generating specific sounds can be put elsewhere.
+
+
+
 \subsection{Playing Melodies}
 \subsection{Ideas for Improvement}
-
-\begin{comment}
-Vi burde kommentere litt om math.h, M\_2\_PI-moroa, samt problemer med
-lydgenereringen. Også kommentere at sinus er alt for treg til å kunne
-brukes direkte. 
-
-Tidligere hadde vi problemer med å regne ut toner og lignende, og vi var
-usikre på hvorfor vi fikk spraking o.l. Vi prøvde også å sette ned
-raten, og det fungerte av ukjente grunner.  Det viser seg at en
-kombinasjon av approksimasjoner av sinus samt mye multiplikasjon gjorde
-interrupt-handleren tregere enn det vi trodde - og det å sette ned raten
-gjorde det mulig interrupt-handleren å produsere lyden vi ønsket, men
-med en dårligere kvalitet.
-\end{comment}
