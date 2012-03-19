@@ -1,21 +1,22 @@
 \section{Introduction}
 
-This report has been written so that the authors will get a better
+The objective of this task is that the authors will get a better
 understanding on how to program in C, how I/O control and interrupt
 handling is done for AVR32 in C, and how to use the AVR32's audio
 bitstream digital to analog converter (ABDAC) for sound generation. The
 task given to us in the course Microcontroller System Design (TDT4258)
-to learn these things was to ``Write a C–program which runs
-directly on the STK1000 board [\ldots] and which plays different sound
-effects when different buttons are pressed. [\ldots] The requirement is
-that you use an interrupt routine to pass the samples to the ABDAC.''\cite{comp}
+to learn these things was to ``Write a C–program which runs directly on
+the STK1000 board [\ldots] and which plays different sound effects when
+different buttons are pressed. [\ldots] The requirement is that you use
+an interrupt routine to pass the samples to the ABDAC.''\cite{comp}
 
-The task was solved incrementally, as all authors have had good experience
-with incremental development of programs in previous projects. Through
-an incremental approach of trying and testing, we could easily pinpoint where and when a bug
-in our program was introduced, and could thus eliminate them relatively
-fast. We also used the AVR32's internal ABDAC, as that was a
-recommendation from the compendium.
+The task was solved incrementally, as all authors have had good
+experience with incremental development of programs in previous
+projects. Through an incremental approach of trying and testing, we
+could easily pinpoint where and when a bug in our program was
+introduced, and could thus eliminate them relatively fast. We also used
+the AVR32's internal ABDAC, as that was a recommendation from the
+compendium.
 
 We decided to use equal temperament, due to the ease of implementing
 songs and tunes as we are already familiar with it. We chose to use sine
