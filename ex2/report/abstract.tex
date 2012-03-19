@@ -1,1 +1,13 @@
-
+Handling input and output data is essential in all programs. When
+developing programs for operative systems, the operative system will
+provide a nice abstraction such that receiving and sending data is made
+easy. When there is no operating system, one have to handle reading and
+writing such data manually. This report shows how to create a C-program
+which runs without an operating system on top of an STK1000 board. The
+program is able to generate sound and send it to audio devices connected
+through the jack socket on the board. This is done by writing to
+memory-mapped I/O owned by the internal audio bitstream digital to
+analog converter, which in turn handles output to the jack socket. The
+I/O is performed in an interrupt routine which is consistently called by
+a clock. We also explain and test out different ways of generating
+sounds to the interrupt routine fast enough.
