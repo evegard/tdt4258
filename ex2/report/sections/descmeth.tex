@@ -18,6 +18,7 @@ The steps required to implement the current assignment were as follows:
     \item Setting up the ABDAC (\emph{Audio Bitstream Digital to Analog
     Converter}).
         \begin{enumerate}
+            \item Configuring I/O to allow using the ABDAC.
             \item Setting up a clock source for the ABDAC.
             \item Configuring the ABDAC.
             \item Implementing an interrupt routine supplying samples to
@@ -29,9 +30,64 @@ The steps required to implement the current assignment were as follows:
 \end{enumerate}
 
 \subsection{Implementation Overview}
+
+The source code files in our final implementation are listed in table
+\ref{tab:sourcefiles}.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{l|l}
+\hline
+\textsc{File} & \textsc{Function} \\ \hline
+\texttt{ex2.c} & \texttt{main} function and initial setup. \\
+\texttt{ex2.h} & Header file for \texttt{ex2.c}. \\
+\texttt{button.c} & Button I/O setup and interrupt routine. \\
+\texttt{button.h} & Header file for \texttt{button.c}. \\
+\texttt{led.c} & LED I/O setup and functions to set and get LED values. \\
+\texttt{led.h} & Header file for \texttt{led.c}. \\
+\texttt{sound.c} & Sound buffer management, ABDAC setup and interrupt
+routine. \\
+\texttt{sound.h} & Header file for \texttt{sound.c}. \\
+\texttt{melody.c} & Melody playing. \\
+\texttt{melody.h} & Header file for \texttt{melody.c}. \\
+\hline
+\end{tabular}
+\caption{Overview of source code files.}
+\label{tab:sourcefiles}
+\end{table}
+
+The program is spread across these files to separate the code into
+logically separate units/modules. The intention was to have separate
+modules for button handling, LED control, sound playing and melody
+playing.
+
 \subsection{LED and Button Control}
+
+The LED control code implemented in \texttt{led.c} works similarly to
+the assembly code in the previous exercise. The same control registers
+are accessed and used the same way. In this C implementation, however,
+we utilize the AVR header files to access the various flags and fields
+as C data structures rather than as bit offsets.
+
+\texttt{led\_init} initializes the I/O pins for LED control. The global
+variable \texttt{led\_setup} contains the current LED state.
+\texttt{led\_update} updates the data pins to reflect the value in
+\texttt{led\_setup}. The utility functions \texttt{led\_set},
+\texttt{led\_get} and \texttt{led\_clear} simplify common LED operations
+by manipulating \texttt{led\_setup} accordingly and then optionally
+calling \texttt{led\_update}.
+
+Button handling is also similar to the assembly code in the previous
+exercise. \texttt{btn\_init} initializes the I/O pins for input and
+registers \texttt{btn\_interrupt} as the interrupt routine for button
+changes. \texttt{btn\_interrupt} is an extended version of the interrupt
+routine in the previous exercise, by checking the status of \emph{all}
+of the eight buttons in a \texttt{for} loop. When a button is pushed,
+\texttt{mel\_set\_melody} is called to change the melody.
+
 \subsection{Playing Sound Samples}
 \subsection{Playing Melodies}
+\subsection{Ideas for Improvement}
 
 \begin{comment}
 Vi burde kommentere litt om math.h, M\_2\_PI-moroa, samt problemer med
@@ -46,4 +102,3 @@ interrupt-handleren tregere enn det vi trodde - og det å sette ned raten
 gjorde det mulig interrupt-handleren å produsere lyden vi ønsket, men
 med en dårligere kvalitet.
 \end{comment}
-
