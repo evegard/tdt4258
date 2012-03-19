@@ -6,7 +6,7 @@ to the result, using the headphones. One of the group members is a hobby
 musician with relative pitch and performed the more advanced listening
 tests.
 
-\subsection{Prerequisites for testing:}
+\subsection*{Prerequisites for testing}
 \begin{itemize}
 \item Code compiles and is uploaded to microcontroller.
 \item Headphones in jack socket.
@@ -15,7 +15,7 @@ tests.
 \item Standard pitch is Concert A, 440Hz.
 \end{itemize}
 
-\subsection{Terms and expressions used in tables}
+\subsection*{Terms and expressions used in tables}
 \begin{itemize}
 \item ``Reasonably clear note'' denotes a clear tone with only light
 noise on top. Some light noise is to be expected due to our hardware,
@@ -27,7 +27,7 @@ pitch of the trusted sample sound are indistinguishable.
 \end{itemize}
 
 Our first implementation used a random number generator as input.
-Test 1:
+\subsection*{Test 1}
 \begin{center}
 \begin{tabular}{|p{3.6cm}|p{3.6cm}|p{3.6cm}|}
 \hline
@@ -39,7 +39,7 @@ Do we have a reasonably clear note? & No. & No. We did not have a clear note at 
 \end{center}
 After this, we tried implementing a sine wave directly with a frequency
 of 440hz.
-Test 2:
+\subsection*{Test 2}
 \begin{center}
 \begin{tabular}{|p{3.6cm}|p{3.6cm}|p{3.6cm}|}
 \hline
@@ -54,7 +54,7 @@ Do we have a pitch consistent with A440? & Yes. & No. {\em Test failed.} \\
 
 As a result of this test, we moved the sine calculation out of the
 interrupt handler, and into a sine lookup table.
-Test 3:
+\subsection*{Test 3}
 \begin{center}
 \begin{tabular}{|p{3.6cm}|p{3.6cm}|p{3.6cm}|}
 \hline
@@ -85,10 +85,10 @@ We concluded that our interrupt handler took too much time by a factor
 of approximately eight. As a result of this, we realised that our method
 was still too slow, and decided to change our lookup table entirely,
 changing to a sound buffer. The sound buffer contains all the
-pre-calculated samples. //TODO:(REF to earlier text!) After this change,
+pre-calculated samples, as seen in section 2.3.2. After this change,
 we decided to test it again.
 
-Test 4:
+\subsection*{Test 4}
 \begin{center}
 \begin{tabular}{|p{3.6cm}|p{3.6cm}|p{3.6cm}|}
 \hline
@@ -108,7 +108,7 @@ left button (button 3) would make the function double the frequency (up
 one octave), and pressing the right button (button 1) would halve the
 frequency (going down one octave).
 
-Test 5:
+\subsection*{Test 5}
 \begin{center}
 \begin{tabular}{|p{3.6cm}|p{3.6cm}|p{3.6cm}|}
 \hline
@@ -133,7 +133,7 @@ buttons for C (1), E (5), and G(8) would give us a sequence called a
 major triad (in this case a C major triad). This sequence is very easily identifiable even to
 non-musicians, as it is found in most popular music.
 
-Test 6:
+\subsection*{Test 6}
 \begin{center}
 \begin{tabular}{|p{3.6cm}|p{3.6cm}|p{3.6cm}|}
 \hline
@@ -154,7 +154,7 @@ decided to test it again by implementing note sequence arrays
 melodies, we chose simple, well-known children's songs so that the
 entire group would easily be able to identify any errors.
 
-Test 7:
+\subsection*{Test 7}
 \begin{center}
 \begin{tabular}{|p{3.6cm}|p{3.6cm}|p{3.6cm}|}
 \hline
@@ -190,7 +190,7 @@ value 0. Having decided this, we implemented ``Itsy Bitsy Spider'' with
 pauses as our introduction melody, along with a few other sequences for
 a win, firing, and a hit.
 
-Test 8:
+\subsection*{Test 8}
 \begin{center}
 \begin{tabular}{|p{3.6cm}|p{3.6cm}|p{3.6cm}|}
 \hline
