@@ -113,8 +113,9 @@ These initialization steps are all contained in the function
 
 The ABDAC will, after activation, trigger the interrupt routine
 \texttt{snd\_interrupt} every time it needs a new sample. The sample
-rate of the ABDAC is the rate of the clock source divided by 256. In our
-case, the sample rate is $\frac{20000000 Hz}{256}=78125 Hz$.
+rate of the ABDAC is the rate of the clock source divided by 256.
+\cite{ap7000} In our case, the sample rate is $\frac{20000000
+Hz}{256}=78125 Hz$.
 
 \subsubsection{Supplying Sound Samples}
 To begin with, we only supplied random data for the sample values. This
@@ -136,7 +137,58 @@ counter, read into the sound buffer correspondingly and return these
 values. The interrupt routine is left as a quick buffer lookup, and the
 code for generating specific sounds can be put elsewhere.
 
-
+The function \texttt{snd\_note\_buffer(frequency)} is used to generate
+a sample buffer for a sinusoidal sound wave of the given frequency. The
+function \texttt{snd\_replace\_buffer} is used to change the currently
+playing sample buffer.
 
 \subsection{Playing Melodies}
+
+Playing melodies consists of keeping track of the playtime of the
+currently playing note and then changing to the next note when it's time
+to do that. This is implemented in \texttt{mel\_play\_loop}. The steps
+performed by \texttt{mel\_play\_loop} are as follows:
+
+\begin{enumerate}
+    \item If the current melody is done, wait until a new melody is
+    selected (busy waiting).
+    \item Create a sample buffer for the next note.
+    \item Change the playback to the new sample buffer (call
+    \texttt{snd\_replace\_buffer}).
+    \item Reset the step counter (timer) for the current note.
+    \item Wait for current note to finish (busy waiting).
+    \item Turn off the LEDs if the melody finished playing.
+    \item Loop back to step 1 unconditionally.
+\end{enumerate}
+
+\texttt{mel\_play\_loop} is an infinite loop entered by a call from
+\texttt{main}. Whereas time efficiency was an important issue in the
+sample interrupt routine, \texttt{mel\_play\_loop} does not have to be
+as fast. The sample interrupt routine will keep getting samples from the
+old sample buffer, until generation of the new buffer is done.
+
+A challenge was to generate a sample buffer to represent silence in a
+melody. As detailed in the Results and Tests chapter, several attempts
+at generating silence resulted in noisy sounds from the ABDAC. This is
+an issue that we didn't manage to solve in the final program.
+
 \subsection{Ideas for Improvement}
+
+We have identified several areas where improvements could be done.
+
+\begin{description}
+    \item [Eliminating busy waiting.]
+        Currently the CPU spins in busy wait loops when waiting for the
+        melody to progress. This consumes energy, and could be improved
+        by putting the processor to sleep between calls to the interrupt
+        routines.
+    \item [Using DMA for sample transfer.]
+        In our program, the ABDAC interrupts the CPU over 78000 times a
+        second to get new samples. The DMA controller could be set up
+        instead to transfer samples to the ABDAC when needed, leaving
+        the CPU time to do other tasks.
+    \item [Using the external DAC.]
+        The internal DAC generates noise when outputting silent sound
+        waves. To alleviate this, we could switch to using the board's
+        external DAC instead, which is of higher quality. \cite{comp}
+\end{description}
