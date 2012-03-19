@@ -10,9 +10,10 @@ tests.
 \begin{itemize}
 \item Code compiles and is uploaded to microcontroller.
 \item Headphones in jack socket.
-\item For pitch-specific tests, person easily able to distinguish between frequencies (relative pitch).
+\item For pitch-specific tests, a person easily able to distinguish between frequencies (relative pitch or absolute pitch).
 \item Trusted sound generator for pitch comparison to absolute frequencies (we used Audacity 1.3 Beta).
 \item Standard pitch is Concert A, 440Hz.
+\item 12-tone equal temperament is used, giving a frequency ratio of $\sqrt[12]{2}$
 \end{itemize}
 
 \subsection*{Terms and expressions used in tables}
@@ -141,8 +142,8 @@ Do we have sound? & Yes. & Yes.\\ \hline
 Do we have a reasonably clear note? & Yes. & Yes. \\ \hline
 Do we have noise beyond this? & No. & No. \\ \hline
 Do the buttons react to pressing? & Yes. & Yes.\\ \hline
-Does a successive pressing of buttons 1-8 play the correct notes? & Yes. & No.\\ \hline
-Does the C major triad play correctly? & Yes. & No.\\ \hline
+Does a successive pressing of buttons 1-8 play the correct notes? & Yes. & No. {\em Test failed.}\\ \hline
+Does the C major triad play correctly? & Yes. & No. {\em Test failed.}\\ \hline
 \end{tabular}
 \end{center}
 
