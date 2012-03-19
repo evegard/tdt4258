@@ -71,10 +71,15 @@ However, due to ending up with the wrong tone we suspected that our interrupt ha
 time, and that samples were not delivered sufficiently fast enough.
 
 We tested this by successively dividing the rate by 2, 4, and 8. Seeing as this was the only difference in our code, we only compared the resulting pitch with 440Hz.
-Rate divisor  |	Consistent with A440?
-2 				No
-4				No
-8				Yes
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+{\sc Rate divisor} & {\sc Consistent with A440} \\ \hline
+2 & No \\ \hline
+4 & No \\ \hline
+8 & Yes \\ \hline
+\end{tabular}
+\end{center}
 
 We concluded that our interrupt handler took too much time by a factor
 of approximately eight. As a result of this, we realised that our method
