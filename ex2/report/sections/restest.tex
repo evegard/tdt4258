@@ -21,7 +21,7 @@ tests.
 noise on top. Some light noise is to be expected due to our hardware,
 and is ignored for testing purposes, as there is no way to change this.
 \item ``Noise'' refers to significant noise, such as low buzzes, high
-beeps, and other noise that goes well beyond the expected light noise.
+beeps, and other noise that goes beyond the expected light noise.
 \item ``Consistent'' means that the pitch of the output and the
 pitch of the trusted sample sound are indistinguishable.
 \end{itemize}
@@ -38,7 +38,7 @@ Do we have a reasonably clear note? & No. & No. We did not have a clear note at 
 \end{tabular}
 \end{center}
 After this, we tried implementing a sine wave directly with a frequency
-of 440hz.
+of 440 Hz.
 \subsection*{Test 2}
 \begin{center}
 \begin{tabular}{|p{3.6cm}|p{3.6cm}|p{3.6cm}|}
@@ -68,9 +68,9 @@ Do we have a pitch consistent with A440? & Yes. & No. {\em Test failed.} \\
 \end{center}
 
 However, due to ending up with the wrong tone we suspected that our interrupt handler still took up too much
-time, and that samples were not delivered sufficiently fast enough.
+time, and that samples were not delivered sufficiently fast.
 
-We tested this by successively dividing the rate by 2, 4, and 8. Seeing as this was the only difference in our code, we only compared the resulting pitch with 440Hz.
+We tested this by successively dividing the rate by 2, 4, and 8. Seeing as this was the only difference in our code, we only compared the resulting pitch with 440 Hz.
 \begin{center}
 \begin{tabular}{|l|l|}
 \hline
@@ -83,10 +83,9 @@ We tested this by successively dividing the rate by 2, 4, and 8. Seeing as this 
 
 We concluded that our interrupt handler took too much time by a factor
 of approximately eight. As a result of this, we realised that our method
-was still too slow, and decided to change our lookup table entirely,
-changing to a sound buffer. The sound buffer contains all the
-pre-calculated samples, as seen in section 2.3.2. After this change,
-we decided to test it again.
+was still too slow, and decided to change the sample generation method
+to a sound buffer. The buffer contains pre-calculated samples of the
+sound wave, as seen in section 2.3.2.
 
 \subsection*{Test 4}
 \begin{center}
@@ -125,11 +124,11 @@ Yes. & Yes. \\ \hline
 \end{center}
 
 We then implemented the chromatic scale using the standard semitone
-frequency ratio [Twelfth root of two] and using 440Hz as a reference
+frequency ratio $\sqrt[12]{2}$ and using 440 Hz as a reference
 point, binding the first eight semitones starting from C4 to the eight
 buttons, in theory giving us a range of C4 to G4. If correct, the pitch
 would increase by a semitone for each higher button pressed, and the
-buttons for C (1), E (5), and G(8) would give us a sequence called a
+buttons for C (1), E (5), and G (8) would give us a sequence called a
 major triad (in this case a C major triad). This sequence is very easily identifiable even to
 non-musicians, as it is found in most popular music.
 
@@ -147,12 +146,12 @@ Does the C major triad play correctly? & Yes. & No.\\ \hline
 \end{tabular}
 \end{center}
 
-At first, we were puzzled at this, and started checking whether we had made an error in calculating the right frequency. However, double-checking the code showed that we had indeed used the
-correct formula for the pitch as far as we could see, and we
-decided to test it again by implementing note sequence arrays
-(melodies), instead of directly binding the tones to the buttons. For
-melodies, we chose simple, well-known children's songs so that the
-entire group would easily be able to identify any errors.
+These results puzzled us. However, double-checking the code showed that
+we had indeed used the correct formula for the pitch, and we decided to
+test it again by implementing note sequence arrays (melodies), instead
+of directly binding the tones to the buttons. For melodies, we chose
+simple, well-known children's songs so that tone errors would be easily
+identifiable.
 
 \subsection*{Test 7}
 \begin{center}
@@ -177,14 +176,14 @@ melodies needed short pauses between certain notes.
 \begin{tabular}{|p{5cm}|p{5cm}|}
 \hline
 {\sc Attempted solution} & {\sc Result} \\ \hline
-Very low frequency.	& Faint crackling noise, buzzing and beeping.  \\ \hline
+Very low amplitude.	& Faint crackling noise, buzzing and beeping.  \\ \hline
 Very high frequency. & Loud buzz.  \\ \hline
 Gradually lowering the amplitude. & Faint crackling noise, buzzing and beeping. Gradual fade-out of tone. \\ \hline
 \end{tabular}
 \end{center}
 
 We have not been able to eliminate this noise, but eventually ended up
-choosing to use a very low frequency, as this noise was the least
+choosing to use a very low amplitude, as this noise was the least
 annoying. This was implemented by using a buffer with one element of
 value 0. Having decided this, we implemented ``Itsy Bitsy Spider'' with
 pauses as our introduction melody, along with a few other sequences for
