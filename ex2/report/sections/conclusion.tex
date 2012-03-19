@@ -6,13 +6,13 @@ in C is done, as well as doing interrupt handling and memory-based I/O
 on an AVR32. In addition, we decided to use a sine wave to generate
 sound, which required more work than any of the other waves we could
 have used instead. By doing this, we learnt how to bypass computation
-heavy sound generation by either pregenerate a single period of a tone
+heavy sound generation by either pregenerating a single period of a tone
 just before it is needed, or by pregenerating all tones used at the
 start of the program. 
 
-While we were not completely satisfied with the noise generated during
+As we were not completely satisfied with the noise generated during
 ``silence'', we tested out many different ways to try to solve the issue.
-While we were unable to solve the problem, we found a plausible reason
-for the noise, as well as a possible solution. We did unfortunately not
+However, though we were unable to solve the problem, we found a plausible reason
+for the noise, as well as a possible solution. Unfortunately, we did not
 have time enough to try out this solution, as it required a major
 refactoring.
