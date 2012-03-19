@@ -1,2 +1,101 @@
 \section{Results and tests}
 
+Testing of the sound production was performed in successive stages, as we refined the code. Tests consisted of uploading the code and listening to the result, using the headphones. One of the group members is a hobby musician with relative pitch and performed the more advanced listening tests.
+
+\title{Prerequisites for testing:}
+\begin{itemize}
+\item Code compiles and is uploaded to microcontroller.
+\item Headphones in jack socket.
+\item For pitch-specific tests, person easily able to distinguish between frequencies (relative pitch).
+\item Trusted sound generator for pitch comparison to absolute frequencies (we used Audacity 1.3 Beta).
+\item Standard pitch is Concert A, 440Hz.
+\end{itemize}
+
+\title{Terms and expressions used in tables}
+\begin{itemize}
+\item ``Reasonably clear note'' denotes a clear tone with only light noise on top. Some light noise is to be expected due to our hardware, and is ignored for testing purposes, as there is no way to change this.
+\item ``Noise'' refers to significant noise, such as low buzzes, high beeps, and other noise that goes well beyond the expected light noise.
+\item ``Consistent'' means that the frequency of the output and the frequency of the trusted sample sound are indistinguishable.
+\end{itemize}
+
+Our first implementation used a random number generator as input.
+Test 1:
+Do we have sound? Expected: Yes. Observed: Yes.
+Do we have noise? Expected: Yes, given our random input. Observed: Yes.
+Do we have a reasonably clear note? Expected: No. Observed: No. We did not have a note at all, as expected.
+
+After this, we tried implementing a sine wave directly with a frequency of 440hz.
+Test 2:
+Do we have sound? Expected: Yes. Observed: Yes.
+Do we have a reasonably clear note? Expected: Yes. Observed: No. Test failed.
+Do we have noise beyond this? Expected: No. Observed: No.
+Do we have a note consistent with A440? Expected: Yes. Observed: No. Test failed.
+
+As a result of this test, we moved the sine calculation out of the interrupt handler, and into a sine lookup table.
+Test 3:
+Do we have sound? Expected: Yes. Observed: Yes.
+Do we have a reasonably clear note? Expected: Yes. Observed: Yes.
+Do we have noise beyond this? Expected: No. Observed: No.
+Do we have a note consistent with A440? Expected: Yes. Observed: No. Test failed.
+
+However, we suspected that our interrupt handler still took up too much time, and that samples were not delivered sufficiently fast enough.
+
+We tested this by successively dividing the rate by 2, 4, and 8. Seeing as this was the only difference in our code, we only compared the resulting pitch with 440Hz.
+Rate divisor  |	Consistent with A440?
+2 				No
+4				No
+8				Yes
+
+We concluded that our interrupt handler took too much time by a factor of approximately eight. As a result of this, we realised that our method was still too slow, and decided to change our lookup table entirely, changing to a sound buffer. The sound buffer contains all the pre-calculated samples. //TODO:(REF to earlier text!) After this change, we decided to test it again.
+
+Test 4:
+Do we have sound? Expected: Yes. Observed: Yes.
+Noise? No. No.
+Clear note? Expected: Yes. Observed: Yes.
+Consistent with A440? Expected: Yes. Observed: Yes.
+
+We were now able to produce a note given a certain frequency. We continued by implementing octaves. Octaves are half or double the frequency, and are perceived by the human ear to be similar. This makes them easy to test for. We used the buttons to control this. Pressing the left button (button 2) would make the function double the frequency (up one octave), and pressing the right button (button 0) would halve the frequency (going down one octave).
+
+Test 5:
+Do we have sound? Yes. Yes.
+Clear note? Yes. Yes.
+Noise? No. No.
+Do the buttons take input? Yes. Yes.
+Does the left button shift the frequency up? Yes.
+Right button shift down? Yes.
+At button press, is frequency change up or down consistent to octaves? Yes. Yes.
+
+We then implemented the chromatic scale using the standard semitone frequency ratio [Twelfth root of two] and using 440Hz as a reference point, binding the first eight semitones starting from C4 to the eight buttons, in theory giving us a range of C4 to G4. If correct, the pitch would increase by a semitone for each higher button pressed, and the buttons for C (1), E (5), and G(8) would give us a sequence called a major triad. This sequence is very easily identifiable even to non-musicians, as it is found in most popular music.
+
+Test 6:
+Sound? Yes. Yes.
+Noise? No. No.
+Clear note? Yes. Yes.
+Buttons function? Yes. Yes.
+Does a successive pressing of buttons 1-8 sound correct? Expected: Yes. Observed: No.
+Major triad test, using buttons 1, 5, and 8. Correct? Expected: Yes. Observed: No.
+
+However, double-checking the code showed that we had indeed used the correct formula for the frequencies as far as we could see, and we decided to test it again by implementing note sequence arrays (melodies), instead of directly binding the tones to the buttons. For melodies, we chose simple, well-known children's songs so that the entire group would easily be able to hear any errors.
+
+Test 7:
+Sound? Yes. Yes.
+Noise? No. No.
+Clear note? Yes. Yes.
+Buttons function? Yes. Yes.
+Do the melodies perform in tune as coded with pitch references? Yes. Yes.
+
+Our test established that the fault must have been somewhere else, and continued implementing melodies and note sequences as planned. We decided that we also needed to find a way to make silences, as our melodies needed short pauses between certain notes.
+
+We tried the following:					Result
+Very low frequency.						Faint crackling noise, buzzing and beeping.
+Very high frequency.					Loud buzz.
+Gradually lowering the amplitude.		Faint crackling noise, no advantage to the fading sound.
+
+We have not been able to eliminate this noise, but eventually ended up choosing to use a very low frequency, as this noise was the least annoying. This was implemented by using a buffer with one element of value 0. Having decided this, we implemented ``Itsy Bitsy Spider'' with pauses as our introduction melody, along with a few other sequences for a win, firing, and a hit.
+
+Test 8:
+Sound? Yes. Yes.
+Noise? No. Yes, we did, during the recently implemented silences.
+Reasonably clear note? Yes. Yes.
+Buttons function? Yes. Yes.
+Do the melodies perform in tune as coded with pitch references? Yes. Yes.
