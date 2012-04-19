@@ -1,0 +1,4 @@
+Issue the following command, in order to cross compile the module for AVR32:
+make ARCH=avr32 CROSS_COMPILE=avr32-linux-
+
+Unfortunately, putting these variables in the Makefile doesn't work
