@@ -37,9 +37,8 @@ void screen_init(void)
     screen = mmap(0,  SCREEN_WIDTH * SCREEN_HEIGHT * 3, PROT_WRITE,
         MAP_SHARED, fb, 0);
 
-    screen_buffer = malloc(SCREEN_WIDTH * SCREEN_HEIGHT * 3);
-
-    screen_bouncer();
+    screen_buffer = calloc(SCREEN_WIDTH * SCREEN_HEIGHT, 3);
+    screen_show_buffer();
 }
 
 void screen_show_buffer(void)

@@ -7,10 +7,13 @@ TARGET=game
 .PHONY : all
 all: $(TARGET)
 
-game: screen.o main.o
+game: screen.o image.o main.o
 	$(CC) $^ -o $@ $(LDFLAGS)
 
 screen.o: screen.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+image.o: image.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 main.o: main.c

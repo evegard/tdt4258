@@ -17,6 +17,7 @@ extern color_t color_red, color_green, color_blue;
 
 void screen_init(void);
 void screen_show_buffer(void);
+
 void screen_clear(color_t color);
 void screen_rectangle(int x, int y, int width, int height, color_t color);
 void screen_line(int xs, int ys, int xe, int ye, color_t color);
