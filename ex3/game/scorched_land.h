@@ -3,13 +3,6 @@
 
 #define GAME_WIDTH 10
 #define GAME_HEIGHT 10
-
-/*
- * These values should only be read, not modified. To move a player, use
- * the function game_move_player with the proper parameters.
- */
-int game_player_x, game_player_y;
-
 /* 
  * These values should only be read, not modified. To scorch a piece of
  * land, use game_shoot_bullet with the proper parameters.
@@ -31,6 +24,14 @@ typedef struct {
     int x;
     int y;
 } game_position_t;
+
+
+/*
+ * These values should only be read, not modified. To move a player, use
+ * the function game_move_player with the proper parameters.
+ */
+game_position_t game_player;
+
 
 /* 
  * Initialize/reset the game. Will destroy the current state of the
