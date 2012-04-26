@@ -4,8 +4,11 @@
 #define GAME_WIDTH 10
 #define GAME_HEIGHT 10
 
-#define GAME_MAX_DIRECTION 1000
-#define GAME_MAX_STRENGTH  1000
+#define GAME_MAX_DIRECTION 90
+#define GAME_MAX_STRENGTH  400
+
+#define GAME_TILE_UNSCORCHED 0
+#define GAME_TILE_SCORCHED 1
 
 /*
  * This integer contains the number of times the soldier has reached the
@@ -71,6 +74,13 @@ const game_position_t GAME_SHOT_OOB = {-1, -1};
  */
 const game_position_t GAME_SHOT_ILLEGAL_ARGUMENT = {-2, -2};
 
+/*
+ * A constant returned from game_shoot_bullet if the tank has shot a
+ * bullet which either hits the soldier or makes it impossible for the
+ * soldier to reach the tank.
+ */
+const game_position_t GAME_SHOT_TANK_WON = {-3, -3};
+
 /* 
  * Initialize/reset the game. Will destroy the current state of the
  * game and return the game to the start condition.
@@ -83,9 +93,10 @@ void game_init ( void );
  * bounds.  Will return GAME_SHOT_ILLEGAL_ARGUMENT if the direction or
  * strength is out of the legal range. If the position is the same as
  * the position the soldier currently is at or it is impossible for the
- * soldier to reach the tank, then the game_tank_score is incremented by
- * one and the game is reset as if game_init () was executed without
- * resetting scores.
+ * soldier to reach the tank, then this function will return
+ * GAME_SHOT_TANK_WON, the game_tank_score is incremented by one and the
+ * game is reset as if game_init () was executed without resetting
+ * scores.
  */
 game_position_t game_shoot_bullet ( int direction, int strength );
 
