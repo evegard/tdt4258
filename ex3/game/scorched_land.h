@@ -7,8 +7,13 @@
 #define GAME_MAX_DIRECTION 90
 #define GAME_MAX_STRENGTH  400
 
-#define GAME_TILE_UNSCORCHED 0
-#define GAME_TILE_SCORCHED 1
+#ifndef FALSE
+#define FALSE 0
+#endif
+
+#ifndef FALSE
+#define TRUE 1
+#endif
 
 /*
  * This integer contains the number of times the soldier has reached the

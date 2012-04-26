@@ -8,7 +8,7 @@ GAME_STRENGTH_SCALE = sqrt ( GAME_WIDTH * GAME_WIDTH +
                              GAME_MAX_STRENGTH;
 
 static void game_reset ( void );
-static char flood_fill ( void );
+static char path_exists ( void );
 
 void game_init ( void )
 {
@@ -22,7 +22,7 @@ static void game_reset ( void )
     int i, j;
     for (i = 0; i < GAME_HEIGHT; i++)
         for ( j = 0; j < GAME_WIDTH; j++)
-            game_is_scorched = GAME_TILE_UNSCORCHED;
+            game_is_scorched[j][i] = FALSE;
     game_player.x = 0;
     game_player.y = 0;
 }
@@ -55,10 +55,10 @@ game_position_t game_shoot_bullet ( int direction, int strength )
 
     /* Otherwise, we've hit a legal target. */
     game_position_t position = {x, y};
-    game_is_scorched[y][x] = GAME_TILE_SCORCHED;
+    game_is_scorched[y][x] = TRUE;
 
     if (( game_player.x == x && game_player.y == y)
-        || flood_fill())
+        || path_exists ())
     {
         game_tank_score++;
         game_reset ();
@@ -111,8 +111,56 @@ game_move_t game_move_player ( game_direction_t dir )
     }
 }
 
-static char flood_fill ( void )
+static char path_exists_dfs (char* visited, int x, int y )
 {
-    /* TODO */
-    return -1;
+    /* Boundary check and check if we've visited this node
+     * before */
+    if (   x < 0 || y < 0 
+        || GAME_WIDTH <= x || GAME_HEIGHT <= y
+        || visited[y][x] == TRUE )
+    {
+        return FALSE;
+    }
+    visited[y][x] = TRUE;
+
+    if ( x == GAME_WIDTH - 1 && y == GAME_HEIGHT - 1)
+        return TRUE;
+
+    if ( game_is_scorched[y][x] == TRUE)
+    {
+        return FALSE;
+    }
+    else 
+    {
+        game_position_t d[4] = {{0,-1},{0,1},
+                                {-1,0},{1,0}};
+        int i;
+        char res = FALSE;
+        map[y * GAME_WIDTH + x] = VISITED;
+        for ( i = 0; i < 4; i++ )
+        {
+            res +=
+                 path_exists_dfs ( map, x + d[i].x, y + d[i].y );
+        }
+        if ( res == FALSE )
+        {
+            return FALSE;
+        }
+        else 
+        {
+            return TRUE;
+        }
+    }
+}
+
+static char path_exists ( void )
+{
+    char visited[GAME_HEIGHT][GAME_WIDTH];
+    int i, j;
+    
+    for ( i = 0; i < GAME_HEIGHT; i++ )
+        for ( j = 0; j < GAME_WIDTH; j++ )
+            visited[i][j] = FALSE;
+
+    return path_exists_dfs ( visited, game_player.x, game_player.y ) ;
 }
