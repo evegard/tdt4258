@@ -1,5 +1,5 @@
-#ifndef __IMAGE_H__
-#define __IMAGE_H__
+#ifndef IMAGE_H
+#define IMAGE_H
 
 #include "screen.h"
 

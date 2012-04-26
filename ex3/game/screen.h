@@ -1,5 +1,5 @@
-#ifndef __SCREEN_H__
-#define __SCREEN_H__
+#ifndef SCREEN_H
+#define SCREEN_H
 
 #define SCREEN_WIDTH  320
 #define SCREEN_HEIGHT 240
@@ -13,7 +13,7 @@ typedef struct color {
 extern color_t *screen;
 extern color_t *screen_buffer;
 
-extern color_t color_red, color_green, color_blue;
+extern color_t color_red, color_green, color_blue, color_purple;
 
 void screen_init(void);
 void screen_show_buffer(void);

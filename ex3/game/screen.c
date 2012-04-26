@@ -5,6 +5,7 @@
 #include <stdlib.h>
 
 #include "screen.h"
+#include "image.h"
 
 color_t *screen;
 color_t *screen_buffer;
@@ -12,24 +13,8 @@ int fb;
 
 color_t color_red = { 0, 0, 255 },
         color_green = { 0, 255, 0 },
-        color_blue = { 255, 0, 0 };
-
-void screen_bouncer()
-{
-    int x = 0, y = 0, dx = 1, dy = 1, w = 50, h = 100;
-    while (1) {
-        screen_clear(color_red);
-        screen_rectangle(x, y, w, h, color_green);
-        screen_line(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2,
-            x + w / 2, y + h / 2, color_blue);
-        screen_show_buffer();
-        if (y + h == SCREEN_HEIGHT && dy == 1) dy = -1;
-        if (y == 0 && dy == -1) dy = 1;
-        if (x + w == SCREEN_WIDTH && dx == 1) dx = -1;
-        if (x == 0 && dx == -1) dx = 1;
-        x += dx; y += dy;
-    }
-}
+        color_blue = { 255, 0, 0 },
+        color_purple = { 255, 0, 255 };
 
 void screen_init(void)
 {
