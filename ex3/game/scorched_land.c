@@ -2,7 +2,11 @@
 #include <math.h>
 #include "scorched_land.h"
 
-static const double 
+const game_position_t GAME_SHOT_OOB = {-1, -1};
+const game_position_t GAME_SHOT_ILLEGAL_ARGUMENT = {-2, -2};
+const game_position_t GAME_SHOT_TANK_WON = {-3, -3};
+
+static const double
 GAME_STRENGTH_SCALE = sqrt ( GAME_WIDTH * GAME_WIDTH +
                              GAME_HEIGHT * GAME_HEIGHT ) /
                              GAME_MAX_STRENGTH;
@@ -24,7 +28,7 @@ static void game_reset ( void )
         for ( j = 0; j < GAME_WIDTH; j++)
             game_is_scorched[j][i] = FALSE;
     game_player.x = 0;
-    game_player.y = 0;
+    game_player.y = GAME_HEIGHT-1;
 }
 
 game_position_t game_shoot_bullet ( int direction, int strength )
@@ -37,14 +41,15 @@ game_position_t game_shoot_bullet ( int direction, int strength )
     }
 
     /* Calculate x and y-positions */
-    double radians = ( dir + 2 * GAME_MAX_DIRECTION ) * M_PI /
-                     ( 2 * GAME_MAX_DIRECTION ),
+    double radians = ( direction ) * ( M_PI / 180 ),
            x_multiplier = cos ( radians ),
            y_multiplier = sin ( radians ),
            scaled_strength = strength *  GAME_STRENGTH_SCALE;
 
-    int    x = (int) (( GAME_WIDTH - 1)  - x_multiplier * scaled_strength ),
-           y = (int) (( GAME_HEIGHT - 1) - y_multiplier * scaled_strength );
+    int    x = (int) ( x_multiplier * scaled_strength ),
+           y = (int) ( y_multiplier * scaled_strength );
+    /* Flip the x-position. */
+    x = GAME_WIDTH - 1 - x;
 
     /* Boundary check on x and y */
     if (  x < 0 || y < 0
@@ -61,8 +66,8 @@ game_position_t game_shoot_bullet ( int direction, int strength )
         || path_exists ())
     {
         game_tank_score++;
-        game_reset ();
-        return 
+        //game_reset ();
+        return GAME_SHOT_TANK_WON;
     }
     else 
     {
@@ -111,17 +116,17 @@ game_move_t game_move_player ( game_direction_t dir )
     }
 }
 
-static char path_exists_dfs (char* visited, int x, int y )
+static char path_exists_dfs (char visited[], int x, int y )
 {
     /* Boundary check and check if we've visited this node
      * before */
     if (   x < 0 || y < 0 
         || GAME_WIDTH <= x || GAME_HEIGHT <= y
-        || visited[y][x] == TRUE )
+        || visited[y * GAME_HEIGHT + x] == TRUE )
     {
         return FALSE;
     }
-    visited[y][x] = TRUE;
+    visited[y * GAME_HEIGHT + x] = TRUE;
 
     if ( x == GAME_WIDTH - 1 && y == GAME_HEIGHT - 1)
         return TRUE;
@@ -136,11 +141,10 @@ static char path_exists_dfs (char* visited, int x, int y )
                                 {-1,0},{1,0}};
         int i;
         char res = FALSE;
-        map[y * GAME_WIDTH + x] = VISITED;
         for ( i = 0; i < 4; i++ )
         {
             res +=
-                 path_exists_dfs ( map, x + d[i].x, y + d[i].y );
+                 path_exists_dfs ( visited, x + d[i].x, y + d[i].y );
         }
         if ( res == FALSE )
         {
@@ -155,12 +159,12 @@ static char path_exists_dfs (char* visited, int x, int y )
 
 static char path_exists ( void )
 {
-    char visited[GAME_HEIGHT][GAME_WIDTH];
+    char visited[GAME_HEIGHT * GAME_WIDTH];
     int i, j;
     
     for ( i = 0; i < GAME_HEIGHT; i++ )
         for ( j = 0; j < GAME_WIDTH; j++ )
-            visited[i][j] = FALSE;
+            visited[i * GAME_HEIGHT + j] = FALSE;
 
     return path_exists_dfs ( visited, game_player.x, game_player.y ) ;
 }

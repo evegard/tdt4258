@@ -11,20 +11,19 @@
 #define FALSE 0
 #endif
 
-#ifndef FALSE
+#ifndef TRUE
 #define TRUE 1
 #endif
-
 /*
  * This integer contains the number of times the soldier has reached the
- * tank since the last time the game was initialized/reset.
+ * tank since the last time the game was initialised/reset.
  */
 int game_soldier_score;
 
 /*
  * This integer contains the number of times the soldier has been hit
  * and/or has no way of reaching the tank since the last time the game
- * was initialized/reset.
+ * was initialised/reset.
  */
 int game_tank_score;
 
@@ -71,20 +70,20 @@ game_position_t game_player;
  * A constant returned from game_shoot_bullet if the shot is out of
  * bounds.
  */
-const game_position_t GAME_SHOT_OOB = {-1, -1};
+extern const game_position_t GAME_SHOT_OOB;
 
 /*
  * A constant returned from game_shoot_bullet if the input argument(s)
  * are outside of the valid range.
  */
-const game_position_t GAME_SHOT_ILLEGAL_ARGUMENT = {-2, -2};
+extern const game_position_t GAME_SHOT_ILLEGAL_ARGUMENT;
 
 /*
  * A constant returned from game_shoot_bullet if the tank has shot a
  * bullet which either hits the soldier or makes it impossible for the
  * soldier to reach the tank.
  */
-const game_position_t GAME_SHOT_TANK_WON = {-3, -3};
+extern const game_position_t GAME_SHOT_TANK_WON;
 
 /* 
  * Initialize/reset the game. Will destroy the current state of the
