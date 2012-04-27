@@ -7,6 +7,8 @@
 #define GAME_MAX_DIRECTION 90
 #define GAME_MAX_STRENGTH  400
 
+#define GAME_TANK_SIZE 2
+
 #ifndef FALSE
 #define FALSE 0
 #endif
@@ -38,7 +40,7 @@ char game_is_scorched[GAME_HEIGHT][GAME_WIDTH];
  * move.
  */
 typedef enum {
-    GAME_NORTH, GAME_SOUTH, GAME_WEST, GAME_EAST
+    GAME_NORTH, GAME_WEST, GAME_SOUTH, GAME_EAST
 } game_direction_t;
 
 
@@ -103,7 +105,7 @@ void game_reset ( void );
  * bounds.  Will return GAME_SHOT_ILLEGAL_ARGUMENT if the direction or
  * strength is out of the legal range. If the position is the same as
  * the position the soldier currently is at or it is impossible for the
- * soldier to reach the tank, then this function will return {-x, -y},
+ * soldier to reach the tank, then this function will return {~x, ~y},
  * where x and y are the coordinates to the tile which was hit.  The
  * game_tank_score is then incremented by one.
  */
