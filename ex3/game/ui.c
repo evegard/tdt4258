@@ -1,3 +1,5 @@
+#include <math.h>
+
 #include "ui.h"
 #include "image.h"
 #include "screen.h"
@@ -5,6 +7,13 @@
 #include "button.h"
 #include "sound.h"
 #include "scorched_land.h"
+
+#ifndef MIN
+#define MIN(a, b)   ((a) < (b) ? (a) : (b))
+#endif
+#ifndef MAX
+#define MAX(a, b)   ((a) > (b) ? (a) : (b))
+#endif
 
 int ui_state = UI_TITLE;
 
@@ -27,7 +36,11 @@ void ui_run(void)
     {
         switch (ui_state)
         {
-            case UI_GAME:       ui_state_game(); break;
+            case UI_GAME_SOLDIER:
+            case UI_GAME_DIRECTION:
+            case UI_GAME_STRENGTH:
+                ui_state_game(); break;
+
             //case UI_SCOREBOARD: ui_state_scoreboard(); break;
 
             default:
@@ -57,7 +70,7 @@ void ui_state_title(void)
         led_update();
 
         if (btn_read() > 0) {
-            ui_state = UI_GAME;
+            ui_state = UI_GAME_SOLDIER;
             game_init();
             return;
         }
@@ -67,6 +80,9 @@ void ui_state_title(void)
 void ui_state_game(void)
 {
     int i, x, y, y_off, go_x, go_y, result;
+    int tank_direction, tank_strength, meter_direction;
+    double radians;
+    game_position_t result_pos;
     image_t *tile;
 
     y_off = SCREEN_HEIGHT - GAME_HEIGHT * UI_TILE_HEIGHT;
@@ -100,6 +116,88 @@ void ui_state_game(void)
             case GAME_EAST: go_x++; break;
         }
 
+        switch (ui_state) {
+            case UI_GAME_SOLDIER:
+                if (go_x >= 0 && go_x < GAME_WIDTH &&
+                    go_y >= 0 && go_y < GAME_HEIGHT) {
+                    screen_rectangle(
+                        go_x * UI_TILE_WIDTH,
+                        go_y * UI_TILE_HEIGHT + y_off,
+                        UI_TILE_WIDTH,
+                        UI_TILE_HEIGHT,
+                        color_blue);
+                }
+
+                if (btn_is_pushed(7)) {
+                    result = game_move_player(ui_player_direction);
+                    if (result == GAME_MOVE_TANK)
+                        return;
+                    if (result == GAME_MOVE_OK) {
+                        tank_direction = 0;
+                        meter_direction = 5;
+                        ui_state = UI_GAME_DIRECTION;
+                    }
+                }
+
+                if (btn_is_pushed(6)) {
+                    ui_player_direction = ++ui_player_direction % 4;
+                }
+
+                break;
+
+            case UI_GAME_DIRECTION:
+                radians = tank_direction * M_PI / 180;
+                x = SCREEN_WIDTH - UI_TILE_WIDTH / 2;
+                y = y_off + UI_TILE_HEIGHT / 2;
+                go_x = -(int)(cos(radians) * UI_TILE_WIDTH * 3);
+                go_y =  (int)(sin(radians) * UI_TILE_HEIGHT * 3);
+                screen_line(x, y, x + go_x, y + go_y, color_red);
+                if (tank_direction >= GAME_MAX_DIRECTION)
+                    meter_direction = -5;
+                if (tank_direction <= 0)
+                    meter_direction = 5;
+                tank_direction += meter_direction;
+                tank_direction = MAX(0, MIN(GAME_MAX_DIRECTION, tank_direction));
+
+                if (btn_is_pushed(0)) {
+                    tank_strength = 40;
+                    meter_direction = 20;
+                    ui_state = UI_GAME_STRENGTH;
+                }
+
+                break;
+
+            case UI_GAME_STRENGTH:
+                radians = tank_direction * M_PI / 180;
+                x = SCREEN_WIDTH - UI_TILE_WIDTH / 2;
+                y = y_off + UI_TILE_HEIGHT / 2;
+                go_x = -(int)(cos(radians) * UI_TILE_WIDTH * 3);
+                go_y =  (int)(sin(radians) * UI_TILE_HEIGHT * 3);
+                screen_line(x, y, x + go_x, y + go_y, color_red);
+                screen_fill_rectangle(
+                    SCREEN_WIDTH - UI_TILE_WIDTH / 2 -
+                        tank_strength * (SCREEN_WIDTH - UI_TILE_WIDTH) / GAME_MAX_STRENGTH,
+                    UI_TILE_HEIGHT / 2,
+                    tank_strength * (SCREEN_WIDTH - UI_TILE_WIDTH) / GAME_MAX_STRENGTH,
+                    UI_TILE_HEIGHT,
+                    color_red);
+                if (tank_strength >= GAME_MAX_STRENGTH)
+                    meter_direction = -20;
+                if (tank_strength <= 40)
+                    meter_direction = 20;
+                tank_strength += meter_direction;
+                tank_strength = MAX(40, MIN(GAME_MAX_STRENGTH, tank_strength));
+
+                if (btn_is_pushed(0)) {
+                    result_pos = game_shoot_bullet(tank_direction, tank_strength);
+                    ui_state = UI_GAME_SOLDIER;
+                    if (result_pos.x < 0 && result_pos.y < 0)
+                        return;
+                }
+
+                break;
+        }
+
         image_draw(
             (GAME_WIDTH - 2) * UI_TILE_WIDTH,
             y_off,
@@ -108,24 +206,7 @@ void ui_state_game(void)
             game_player.x * UI_TILE_WIDTH,
             game_player.y * UI_TILE_HEIGHT + y_off,
             img_soldier);
-        if (go_x >= 0 && go_x < GAME_WIDTH &&
-            go_y >= 0 && go_y < GAME_HEIGHT) {
-            screen_rectangle(
-                go_x * UI_TILE_WIDTH,
-                go_y * UI_TILE_HEIGHT + y_off,
-                UI_TILE_WIDTH,
-                UI_TILE_HEIGHT,
-                color_blue);
-        }
 
         screen_show_buffer();
-
-        if (btn_is_pushed(6))
-            ui_player_direction = ++ui_player_direction % 4;
-        if (btn_is_pushed(7)) {
-            result = game_move_player(ui_player_direction);
-            if (result == GAME_MOVE_TANK)
-                return;
-        }
     }
 }
