@@ -3,12 +3,10 @@
 #include "screen.h"
 #include "led.h"
 #include "button.h"
+#include "sound.h"
 #include "scorched_land.h"
 
 int ui_state = UI_TITLE;
-
-int ui_soldier_wins = 0,
-    ui_tank_wins = 0;
 
 game_direction_t ui_player_direction = GAME_EAST;
 
@@ -29,9 +27,11 @@ void ui_run(void)
     {
         switch (ui_state)
         {
-            case UI_TITLE:      ui_state_title(); break;
             case UI_GAME:       ui_state_game(); break;
             //case UI_SCOREBOARD: ui_state_scoreboard(); break;
+
+            default:
+            case UI_TITLE:      ui_state_title(); break;
         }
     }
 }
@@ -39,6 +39,8 @@ void ui_run(void)
 void ui_state_title(void)
 {
     int x = 0, y = 0, dx = 1, dy = 1, w = 20, h = 20, i = 0;
+
+    snd_play("sounds/intro-valkyrie.raw");
 
     while (1) {
         image_draw(0, 0, img_bg);
@@ -64,7 +66,7 @@ void ui_state_title(void)
 
 void ui_state_game(void)
 {
-    int i, x, y, y_off;
+    int i, x, y, y_off, go_x, go_y, result;
     image_t *tile;
 
     y_off = SCREEN_HEIGHT - GAME_HEIGHT * UI_TILE_HEIGHT;
@@ -74,6 +76,11 @@ void ui_state_game(void)
         led_set(7 - i, 1);
     for (i = 0; i < game_tank_score; i++)
         led_set(i, 1);
+
+    if (game_soldier_score >= 4 || game_tank_score >= 4) {
+        ui_state = UI_SCOREBOARD;
+        return;
+    }
 
     game_reset();
 
@@ -85,14 +92,40 @@ void ui_state_game(void)
                 image_draw(x * UI_TILE_WIDTH, y * UI_TILE_HEIGHT + y_off, tile);
             }
 
-        image_draw(
-            game_player.x * UI_TILE_WIDTH,
-            game_player.y * UI_TILE_HEIGHT + y_off,
-            img_soldier);
+        go_x = game_player.x; go_y = game_player.y;
+        switch (ui_player_direction) {
+            case GAME_NORTH: go_y--; break;
+            case GAME_SOUTH: go_y++; break;
+            case GAME_WEST: go_x--; break;
+            case GAME_EAST: go_x++; break;
+        }
+
         image_draw(
             (GAME_WIDTH - 2) * UI_TILE_WIDTH,
             y_off,
             img_tank);
+        image_draw(
+            game_player.x * UI_TILE_WIDTH,
+            game_player.y * UI_TILE_HEIGHT + y_off,
+            img_soldier);
+        if (go_x >= 0 && go_x < GAME_WIDTH &&
+            go_y >= 0 && go_y < GAME_HEIGHT) {
+            screen_rectangle(
+                go_x * UI_TILE_WIDTH,
+                go_y * UI_TILE_HEIGHT + y_off,
+                UI_TILE_WIDTH,
+                UI_TILE_HEIGHT,
+                color_blue);
+        }
+
         screen_show_buffer();
+
+        if (btn_is_pushed(6))
+            ui_player_direction = ++ui_player_direction % 4;
+        if (btn_is_pushed(7)) {
+            result = game_move_player(ui_player_direction);
+            if (result == GAME_MOVE_TANK)
+                return;
+        }
     }
 }

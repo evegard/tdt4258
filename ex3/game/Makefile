@@ -2,8 +2,7 @@ CC=avr32-linux-gcc
 CFLAGS=-g -Wall -Iinclude 
 LDFLAGS=-g -Wall -pedantic -Llib -lm -pthread
 TARGET=game
-OBJS=screen.o image.o led.o button.o sound.o melody.o \
-     ui.o scorched_land.o main.o
+OBJS=screen.o image.o led.o button.o sound.o ui.o scorched_land.o main.o
 
 ####### RULES ##########################################################
 .PHONY : all

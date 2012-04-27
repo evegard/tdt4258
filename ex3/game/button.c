@@ -21,5 +21,9 @@ char btn_read()
 
 int btn_is_pushed(int i)
 {
+    volatile int j;
+    if ((btn_read() & (1 << i)) == 0)
+        return 0;
+    for (j = 0; j < 1000; j++);
     return (btn_read() & (1 << i)) != 0;
 }

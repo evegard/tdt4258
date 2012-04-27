@@ -34,15 +34,23 @@ void screen_show_buffer(void)
 
 void screen_clear(color_t color)
 {
-    screen_rectangle(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, color);
+    screen_fill_rectangle(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, color);
 }
 
-void screen_rectangle(int x, int y, int width, int height, color_t color)
+void screen_fill_rectangle(int x, int y, int width, int height, color_t color)
 {
     int i, j;
     for (i = x; i < x + width; i++)
         for (j = y; j < y + height; j++)
             screen_put(i, j, color);
+}
+
+void screen_rectangle(int x, int y, int width, int height, color_t color)
+{
+    screen_line(x, y, x + width - 1, y, color_blue);
+    screen_line(x, y + height - 1, x + width - 1, y + height - 1, color_blue);
+    screen_line(x, y, x, y + height - 1, color_blue);
+    screen_line(x + width - 1, y, x + width - 1, y + height - 1, color_blue);
 }
 
 void screen_line(int xs, int ys, int xe, int ye, color_t color)
