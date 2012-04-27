@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include <math.h>
 #include "scorched_land.h"
 
@@ -64,8 +65,8 @@ game_position_t game_shoot_bullet ( int direction, int strength )
         || ( path_exists () == FALSE ))
     {
         game_tank_score++;
-        position.x *= -1;
-        position.y *= -1;
+        position.x = ~position.x;
+        position.y = ~position.y;
         return position;
     }
     else 
@@ -102,8 +103,8 @@ game_move_t game_move_player ( game_direction_t dir )
     game_player.x += dx;
     game_player.y += dy;
     
-    if (   ( GAME_WIDTH - 1 <= game_player.x )
-       && ( GAME_HEIGHT - 1 <= game_player.y ))
+    if (   ( GAME_WIDTH - GAME_TANK_SIZE <= game_player.x )
+       &&  ( game_player.y < GAME_TANK_SIZE ))
     {
         game_soldier_score++;
         return GAME_MOVE_TANK;
@@ -125,16 +126,16 @@ static char path_exists_dfs (char* visited, int x, int y )
      * before */
     if (   x < 0 || y < 0 
         || GAME_WIDTH <= x || GAME_HEIGHT <= y
-        || visited[y * GAME_HEIGHT + x] == TRUE )
+        || visited[y * GAME_WIDTH + x] == TRUE )
     {
         return FALSE;
     }
-    visited[y * GAME_HEIGHT + x] = TRUE;
+    visited[y * GAME_WIDTH + x] = TRUE;
 
-    if ( GAME_WIDTH - 2 <= x && GAME_HEIGHT - 2 <= y)
+    if ( GAME_WIDTH - GAME_TANK_SIZE <= x && y < GAME_TANK_SIZE )
         return TRUE;
 
-    if ( game_is_scorched[y][x] == TRUE)
+    if ( game_is_scorched[y][x] == TRUE )
     {
         return FALSE;
     }
@@ -146,17 +147,10 @@ static char path_exists_dfs (char* visited, int x, int y )
         char res = FALSE;
         for ( i = 0; i < 4; i++ )
         {
-            res +=
-                 path_exists_dfs ( visited, x + d[i].x, y + d[i].y );
+            if ( path_exists_dfs ( visited, x + d[i].x, y + d[i].y ) )
+                res = TRUE;
         }
-        if ( res == FALSE )
-        {
-            return FALSE;
-        }
-        else 
-        {
-            return TRUE;
-        }
+        return res;
     }
 }
 
@@ -168,6 +162,6 @@ static char path_exists ( void )
     for ( y = 0; y < GAME_HEIGHT; y++ )
         for ( x = 0; x < GAME_WIDTH; x++ )
             visited[y][x] = FALSE;
-
-    return path_exists_dfs ( &(visited[0][0]), game_player.x, game_player.y ) ;
+    char res = path_exists_dfs ( &(visited[0][0]), game_player.x, game_player.y );
+    return res;
 }
