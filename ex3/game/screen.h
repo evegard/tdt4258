@@ -13,7 +13,8 @@ typedef struct color {
 extern color_t *screen;
 extern color_t *screen_buffer;
 
-extern color_t color_red, color_green, color_blue, color_purple;
+extern color_t color_red, color_green, color_blue, color_purple,
+               color_black;
 
 void screen_init(void);
 void screen_show_buffer(void);
