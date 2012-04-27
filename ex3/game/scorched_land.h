@@ -79,17 +79,18 @@ extern const game_position_t GAME_SHOT_OOB;
 extern const game_position_t GAME_SHOT_ILLEGAL_ARGUMENT;
 
 /*
- * A constant returned from game_shoot_bullet if the tank has shot a
- * bullet which either hits the soldier or makes it impossible for the
- * soldier to reach the tank.
- */
-extern const game_position_t GAME_SHOT_TANK_WON;
-
-/* 
- * Initialize/reset the game. Will destroy the current state of the
- * game and return the game to the start condition.
+ * Initialise the game. Will destroy the current state of the game and
+ * return the game to the start condition. Equivalent to calling
+ * game_reset and setting the scores to zero.
  */
 void game_init ( void );
+
+/*
+ * Resets the game, by moving the soldier back to start and removes all
+ * the scorched land, but does not remove the score by each player.
+ */
+
+void game_reset ( void );
 
 /*
  * Shoots a bullet with direction and strength given as input. Returns
@@ -97,10 +98,9 @@ void game_init ( void );
  * bounds.  Will return GAME_SHOT_ILLEGAL_ARGUMENT if the direction or
  * strength is out of the legal range. If the position is the same as
  * the position the soldier currently is at or it is impossible for the
- * soldier to reach the tank, then this function will return
- * GAME_SHOT_TANK_WON, the game_tank_score is incremented by one and the
- * game is reset as if game_init () was executed without resetting
- * scores.
+ * soldier to reach the tank, then this function will return {-x, -y},
+ * where x and y are the coordinates to the tile which was hit.  The
+ * game_tank_score is then incremented by one.
  */
 game_position_t game_shoot_bullet ( int direction, int strength );
 
@@ -110,9 +110,8 @@ game_position_t game_shoot_bullet ( int direction, int strength );
  * tile the player wants to move to is scorched, GAME_MOVE_OOB if the
  * tile is out of bounds, and GAME_MOVE_TANK if the tile we're moving to
  * is the tank. Will only change the player's position if the move is
- * successful (GAME_MOVE_OK). If the result is GAME_MOVE_TANK, then the
- * score of the soldier is incremented by one and the game is reset as
- * if game_init () was executed without resetting scores.
+ * successful (GAME_MOVE_OK). If the result is GAME_MOVE_TANK the score
+ * of the soldier is incremented by one.
  */
 game_move_t game_move_player ( game_direction_t dir );
 

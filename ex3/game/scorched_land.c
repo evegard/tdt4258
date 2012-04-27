@@ -2,16 +2,14 @@
 #include <math.h>
 #include "scorched_land.h"
 
-const game_position_t GAME_SHOT_OOB = {-1, -1};
-const game_position_t GAME_SHOT_ILLEGAL_ARGUMENT = {-2, -2};
-const game_position_t GAME_SHOT_TANK_WON = {-3, -3};
+const game_position_t GAME_SHOT_OOB = {GAME_WIDTH, GAME_HEIGHT};
+const game_position_t GAME_SHOT_ILLEGAL_ARGUMENT = {GAME_WIDTH + 1, GAME_HEIGHT + 1};
 
 static const double
 GAME_STRENGTH_SCALE = sqrt ( GAME_WIDTH * GAME_WIDTH +
                              GAME_HEIGHT * GAME_HEIGHT ) /
                              GAME_MAX_STRENGTH;
 
-static void game_reset ( void );
 static char path_exists ( void );
 
 void game_init ( void )
@@ -21,7 +19,7 @@ void game_init ( void )
     game_reset ();
 }
 
-static void game_reset ( void )
+void game_reset ( void )
 {
     int i, j;
     for (i = 0; i < GAME_HEIGHT; i++)
@@ -63,11 +61,12 @@ game_position_t game_shoot_bullet ( int direction, int strength )
     game_is_scorched[y][x] = TRUE;
 
     if (( game_player.x == x && game_player.y == y)
-        || path_exists ())
+        || ( path_exists () == FALSE ))
     {
         game_tank_score++;
-        //game_reset ();
-        return GAME_SHOT_TANK_WON;
+        position.x *= -1;
+        position.y *= -1;
+        return position;
     }
     else 
     {
@@ -106,7 +105,6 @@ game_move_t game_move_player ( game_direction_t dir )
     if (   ( GAME_WIDTH - 1 <= game_player.x )
        && ( GAME_HEIGHT - 1 <= game_player.y ))
     {
-        game_reset ();
         game_soldier_score++;
         return GAME_MOVE_TANK;
     }
@@ -116,7 +114,7 @@ game_move_t game_move_player ( game_direction_t dir )
     }
 }
 
-static char path_exists_dfs (char visited[], int x, int y )
+static char path_exists_dfs (char* visited, int x, int y )
 {
     /* Boundary check and check if we've visited this node
      * before */
@@ -159,12 +157,12 @@ static char path_exists_dfs (char visited[], int x, int y )
 
 static char path_exists ( void )
 {
-    char visited[GAME_HEIGHT * GAME_WIDTH];
+    char visited[GAME_HEIGHT][GAME_WIDTH];
     int i, j;
     
     for ( i = 0; i < GAME_HEIGHT; i++ )
         for ( j = 0; j < GAME_WIDTH; j++ )
-            visited[i * GAME_HEIGHT + j] = FALSE;
+            visited[i][j] = FALSE;
 
-    return path_exists_dfs ( visited, game_player.x, game_player.y ) ;
+    return path_exists_dfs ( &(visited[0][0]), game_player.x, game_player.y ) ;
 }
