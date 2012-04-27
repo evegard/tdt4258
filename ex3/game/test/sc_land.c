@@ -16,19 +16,20 @@
 void print_map ( void )
 {
     int x, y;
-    printf(CLEAR_SCREEN C_SCORE " S: %d  --  T: %d " C_END "\n",
-            game_soldier_score, game_tank_score);
-    for (y = 0; y < GAME_HEIGHT; y++){
-        for (x = 0; x < GAME_WIDTH; x++)
-            if (game_player.x == x && game_player.y == y)
-                printf(C_MILITARY "S");
-            else if (y < GAME_TANK_SIZE &&
-                     GAME_WIDTH - GAME_TANK_SIZE <= x)
-                printf(C_MILITARY "T");
+    printf ( CLEAR_SCREEN C_SCORE " S: %d  --  T: %d " C_END "\n",
+             game_soldier_score, game_tank_score );
+    for ( y = 0; y < GAME_HEIGHT; y++ )
+    {
+        for ( x = 0; x < GAME_WIDTH; x++ )
+            if ( game_player.x == x && game_player.y == y )
+                printf ( C_MILITARY "S" );
+            else if ( y < GAME_TANK_SIZE &&
+                      GAME_WIDTH - GAME_TANK_SIZE <= x )
+                printf ( C_MILITARY "T" );
             else
-                printf(game_is_scorched[y][x] ? C_SCORCHED "X"
-                                              : C_GRASS    "," );
-        printf(C_END "\n");
+                printf ( game_is_scorched[y][x] ? C_SCORCHED "X"
+                                                : C_GRASS    "," );
+        printf ( C_END "\n" );
     }
 }
 
