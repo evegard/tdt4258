@@ -1,7 +1,7 @@
 #ifndef SCORCHED_LAND
 #define SCORCHED_LAND
 
-#define GAME_WIDTH 10
+#define GAME_WIDTH 16
 #define GAME_HEIGHT 10
 
 #define GAME_MAX_DIRECTION 90
@@ -59,6 +59,11 @@ typedef struct {
     int y;
 } game_position_t;
 
+/*
+ * Checks whether two game_position_t elements are equal.
+ */
+
+char game_position_equals ( game_position_t a, game_position_t b );
 
 /*
  * These values should only be read, not modified. To move a player, use

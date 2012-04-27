@@ -21,10 +21,10 @@ void game_init ( void )
 
 void game_reset ( void )
 {
-    int i, j;
-    for (i = 0; i < GAME_HEIGHT; i++)
-        for ( j = 0; j < GAME_WIDTH; j++)
-            game_is_scorched[j][i] = FALSE;
+    int y, x;
+    for (y = 0; y < GAME_HEIGHT; y++)
+        for ( x = 0; x < GAME_WIDTH; x++)
+            game_is_scorched[y][x] = FALSE;
     game_player.x = 0;
     game_player.y = GAME_HEIGHT-1;
 }
@@ -81,8 +81,8 @@ game_move_t game_move_player ( game_direction_t dir )
     {
         case GAME_NORTH: dy = -1; break;
         case GAME_SOUTH: dy =  1; break;
-        case  GAME_WEST: dx = -1; break;
-        case  GAME_EAST: dx =  1; break;
+        case GAME_WEST:  dx = -1; break;
+        case GAME_EAST:  dx =  1; break;
     }
     /* Boundary check */
     if (   (( game_player.x + dx ) < 0 )
@@ -114,6 +114,11 @@ game_move_t game_move_player ( game_direction_t dir )
     }
 }
 
+char game_position_equals ( game_position_t a, game_position_t b )
+{
+    return ( a.x == b.x && a.y == b.y );
+}
+
 static char path_exists_dfs (char* visited, int x, int y )
 {
     /* Boundary check and check if we've visited this node
@@ -126,7 +131,7 @@ static char path_exists_dfs (char* visited, int x, int y )
     }
     visited[y * GAME_HEIGHT + x] = TRUE;
 
-    if ( x == GAME_WIDTH - 1 && y == GAME_HEIGHT - 1)
+    if ( GAME_WIDTH - 2 <= x && GAME_HEIGHT - 2 <= y)
         return TRUE;
 
     if ( game_is_scorched[y][x] == TRUE)
@@ -158,11 +163,11 @@ static char path_exists_dfs (char* visited, int x, int y )
 static char path_exists ( void )
 {
     char visited[GAME_HEIGHT][GAME_WIDTH];
-    int i, j;
+    int y, x;
     
-    for ( i = 0; i < GAME_HEIGHT; i++ )
-        for ( j = 0; j < GAME_WIDTH; j++ )
-            visited[i][j] = FALSE;
+    for ( y = 0; y < GAME_HEIGHT; y++ )
+        for ( x = 0; x < GAME_WIDTH; x++ )
+            visited[y][x] = FALSE;
 
     return path_exists_dfs ( &(visited[0][0]), game_player.x, game_player.y ) ;
 }
