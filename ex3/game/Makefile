@@ -7,7 +7,7 @@ TARGET=game
 .PHONY : all
 all: $(TARGET)
 
-game: screen.o image.o led.o button.o sound.o melody.o ui.o scorched_land.o main.o
+game: screen.o image.o led.o button.o sound.o ui.o scorched_land.o main.o
 	$(CC) $^ -o $@ $(LDFLAGS)
 
 screen.o: screen.c
@@ -23,9 +23,6 @@ button.o: button.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 sound.o: sound.c
-	$(CC) $(CFLAGS) -c $< -o $@
-
-melody.o: melody.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 ui.o: ui.c

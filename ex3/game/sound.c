@@ -2,84 +2,63 @@
 #include <sys/ioctl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/mman.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <math.h>
+#include <pthread.h>
 
 #include "sound.h"
-#include "melody.h"
 
-#ifndef MIN
-#define MIN(a, b)   ((a) < (b) ? (a) : (b))
-#endif
+#define SND_RATE    22050
+#define SND_SIZE    16
 
-int snd_file;
+int snd_device;
 
-int snd_buffer_step = 0;
-
-short *snd_buffer = NULL;
-int snd_buffer_len = 0;
+void *snd_play_loop(void *arg);
 
 void snd_init()
 {
     int temp;
 
-    snd_file = open("/dev/dsp", O_WRONLY);
+    snd_device = open("/dev/dsp", O_WRONLY);
 
     temp = SND_SIZE;
-    ioctl(snd_file, SOUND_PCM_WRITE_BITS, &temp);
+    ioctl(snd_device, SOUND_PCM_WRITE_BITS, &temp);
 
     temp = SND_RATE;
-    ioctl(snd_file, SOUND_PCM_WRITE_RATE, &temp);
+    ioctl(snd_device, SOUND_PCM_WRITE_RATE, &temp);
 }
 
-int snd_note_buffer_len(double frequency)
+void snd_play(char *filename)
 {
-    return SND_RATE / frequency;
-}
-
-short* snd_note_buffer(double frequency)
-{
-    int len = snd_note_buffer_len(frequency);
-    short *buffer = malloc(len * sizeof(short));
-    int i;
-
-    for (i = 0; i < len; i++) {
-        buffer[i] = sin(i * 2 * M_PI / len) * SND_AMP;
-    }
-
-    return buffer;
-}
-
-void snd_replace_buffer(short *new_buffer, int new_buffer_len)
-{
-    short *old_buffer;
-
-    snd_buffer_len = MIN(snd_buffer_len, new_buffer_len);
-    old_buffer = snd_buffer;
-    snd_buffer = new_buffer;
-    snd_buffer_len = new_buffer_len;
-
-    free(old_buffer);
+    pthread_t thread;
+    pthread_create(&thread, 0, snd_play_loop, filename);
 }
 
 void *snd_play_loop(void *arg)
 {
-    while (1) {
-        if (snd_buffer_step >= snd_buffer_len) {
-            snd_buffer_step = 0;
-        }
+    int file;
+    struct stat st;
+    short *buffer;
+    int buffer_len;
+    int buffer_step;
+    
+    file = open((char *)arg, O_RDONLY);
+    fstat(file, &st);
 
-        if (snd_buffer_len) {
-            write(snd_file, &snd_buffer[snd_buffer_step], 2);
-        } else {
-            int buffer = 0;
-            write(snd_file, &buffer, 2);
-        }
-        
-        snd_buffer_step++;
-        mel_cur_note_step++;
+    buffer = mmap(0, st.st_size, PROT_READ, MAP_SHARED, file, 0);
+    buffer_len = st.st_size / (SND_SIZE / 8);
+    buffer_step = 0;
+
+    while (buffer_step < buffer_len) {
+        write(snd_device, &buffer[buffer_step], (SND_SIZE / 8));
+        buffer_step++;
     }
+
+    munmap(buffer, st.st_size);
+    close(file);
+
     return 0;
 }
