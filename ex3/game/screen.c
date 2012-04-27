@@ -14,7 +14,8 @@ int fb;
 color_t color_red = { 0, 0, 255 },
         color_green = { 0, 255, 0 },
         color_blue = { 255, 0, 0 },
-        color_purple = { 255, 0, 255 };
+        color_purple = { 255, 0, 255 },
+        color_black = { 0, 0, 0 };
 
 void screen_init(void)
 {
