@@ -17,7 +17,8 @@
 
 int snd_device;
 pthread_t snd_cur_thread;
-static volatile sig_atomic_t prev_sound_finished;
+static volatile sig_atomic_t snd_prev_sound_finished;
+static volatile sig_atomic_t snd_stop_current_sound;
 
 void *snd_play_loop(void *arg);
 
@@ -25,7 +26,8 @@ void snd_init()
 {
     int temp;
     
-    prev_sound_finished = 1;
+    snd_prev_sound_finished = 1;
+    snd_stop_current_sound = 0;
 
     snd_device = open("/dev/dsp", O_WRONLY);
 
@@ -38,8 +40,8 @@ void snd_init()
 
 void snd_play(char *filename)
 {
-    if (!prev_sound_finished) {
-        pthread_kill(snd_cur_thread, 0);
+    if (!snd_prev_sound_finished) {
+        snd_stop_current_sound = 1;
     }
     pthread_create(&snd_cur_thread, 0, snd_play_loop, filename);
 }
@@ -52,7 +54,7 @@ void snd_play_wait(char *filename)
 
 void *snd_play_loop(void *arg)
 {
-    prev_sound_finished = 0;
+    snd_prev_sound_finished = 0;
     
     int file;
     struct stat st;
@@ -70,11 +72,14 @@ void *snd_play_loop(void *arg)
     while (buffer_step < buffer_len) {
         write(snd_device, &buffer[buffer_step], (SND_SIZE / 8));
         buffer_step++;
+        if (snd_stop_current_sound)
+            break;
     }
 
     munmap(buffer, st.st_size);
     close(file);
 
-    prev_sound_finished = 1;
+    snd_prev_sound_finished = 1;
+    snd_stop_current_sound = 0;
     return 0;
 }

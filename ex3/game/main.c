@@ -1,7 +1,4 @@
-#include <pthread.h>
-
 #include "screen.h"
-#include "image.h"
 #include "led.h"
 #include "button.h"
 #include "sound.h"

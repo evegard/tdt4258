@@ -1,4 +1,5 @@
 #include <math.h>
+#include <stdlib.h>
 
 #include "ui.h"
 #include "image.h"
@@ -18,11 +19,13 @@
 int ui_state = UI_TITLE;
 
 game_direction_t ui_player_direction = GAME_EAST;
+int ui_play_point_sound = 1;
 
 image_t *img_bg, *img_soldier, *img_tank, *img_grass, *img_dirt,
         *img_soldier_win, *img_tank_win;
 
-#define UI_MAX_POINTS   1
+#define UI_MAX_POINTS   2
+
 #define UI_TILE_WIDTH   20
 #define UI_TILE_HEIGHT  20
 #define UI_Y_OFFSET     (SCREEN_HEIGHT - GAME_HEIGHT * UI_TILE_HEIGHT)
@@ -139,15 +142,19 @@ void ui_state_game(void)
                         color_blue);
                 }
 
-                if (play_explosion) {
+                if (ui_play_point_sound)
+                    snd_play("sounds/point.raw");
+                else if (play_explosion)
                     snd_play("sounds/eksplosjon.raw");
-                    play_explosion = 0;
-                }
+                ui_play_point_sound = 0;
+                play_explosion = 0;
 
                 if (btn_is_pushed(7)) {
                     result = game_move_player(ui_player_direction);
-                    if (result == GAME_MOVE_TANK)
+                    if (result == GAME_MOVE_TANK) {
+                        ui_play_point_sound = 1;
                         return;
+                    }
                     if (result == GAME_MOVE_OK) {
                         tank_direction = GAME_MIN_DIRECTION;
                         meter_direction = UI_DIRECTION_SPEED;
@@ -162,10 +169,18 @@ void ui_state_game(void)
                 break;
 
             case UI_GAME_DIRECTION:
+                if (btn_is_pushed(0)) {
+                    tank_strength = GAME_MIN_STRENGTH;
+                    meter_direction = UI_STRENGTH_SPEED;
+                    ui_state = UI_GAME_STRENGTH;
+                    break;
+                }
+
                 radians = tank_direction * M_PI / 180;
                 aimline_x2 = aimline_x1 - (int)(cos(radians) * UI_TILE_WIDTH * 3);
                 aimline_y2 = aimline_y1 + (int)(sin(radians) * UI_TILE_HEIGHT * 3);
                 screen_line(aimline_x1, aimline_y1, aimline_x2, aimline_y2, color_red);
+
                 if (tank_direction >= GAME_MAX_DIRECTION)
                     meter_direction = -UI_DIRECTION_SPEED;
                 if (tank_direction <= GAME_MIN_DIRECTION)
@@ -174,15 +189,22 @@ void ui_state_game(void)
                 tank_direction = MAX(GAME_MIN_DIRECTION, tank_direction);
                 tank_direction = MIN(GAME_MAX_DIRECTION, tank_direction);
 
-                if (btn_is_pushed(0)) {
-                    tank_strength = GAME_MIN_STRENGTH;
-                    meter_direction = UI_STRENGTH_SPEED;
-                    ui_state = UI_GAME_STRENGTH;
-                }
-
                 break;
 
             case UI_GAME_STRENGTH:
+                if (btn_is_pushed(0)) {
+                    snd_play_wait("sounds/skyte.raw");
+                    result_pos = game_shoot_bullet(tank_direction, tank_strength);
+                    ui_state = UI_GAME_SOLDIER;
+                    play_explosion = !game_position_equals(result_pos,
+                        GAME_SHOT_OOB);
+                    if (result_pos.x < 0 && result_pos.y < 0) {
+                        ui_play_point_sound = 1;
+                        return;
+                    }
+                    break;
+                }
+
                 screen_line(aimline_x1, aimline_y1, aimline_x2, aimline_y2, color_red);
                 strengthbar_width = tank_strength *
                     (SCREEN_WIDTH - UI_TILE_WIDTH) / GAME_MAX_STRENGTH;
@@ -192,6 +214,7 @@ void ui_state_game(void)
                     strengthbar_width,
                     UI_TILE_HEIGHT,
                     color_red);
+
                 if (tank_strength >= GAME_MAX_STRENGTH)
                     meter_direction = -UI_STRENGTH_SPEED;
                 if (tank_strength <= GAME_MIN_STRENGTH)
@@ -199,16 +222,6 @@ void ui_state_game(void)
                 tank_strength += meter_direction;
                 tank_strength = MAX(GAME_MIN_STRENGTH, tank_strength);
                 tank_strength = MIN(GAME_MAX_STRENGTH, tank_strength);
-
-                if (btn_is_pushed(0)) {
-                    snd_play_wait("sounds/skyte.raw");
-                    result_pos = game_shoot_bullet(tank_direction, tank_strength);
-                    ui_state = UI_GAME_SOLDIER;
-                    play_explosion = !game_position_equals(result_pos,
-                        GAME_SHOT_OOB);
-                    if (result_pos.x < 0 && result_pos.y < 0)
-                        return;
-                }
 
                 break;
         }
@@ -228,11 +241,49 @@ void ui_state_game(void)
 
 void ui_state_scoreboard(void)
 {
-    if (game_soldier_score == UI_MAX_POINTS)
-        image_draw(0, 0, img_soldier_win);
-    else
-        image_draw(0, 0, img_tank_win);
-    screen_show_buffer();
-    snd_play_wait("sounds/intro-valkyrie.raw");
+    volatile int i;
+    int x, y, dx, dy, w, h;
+    image_t *bg, *sprite;
+
     ui_state = UI_TITLE;
+
+    if (game_soldier_score == UI_MAX_POINTS) {
+        bg = img_soldier_win;
+        sprite = img_tank;
+    } else {
+        bg = img_tank_win;
+        sprite = img_soldier;
+    }
+
+    w = sprite->width;
+    h = sprite->height;
+
+    snd_play_wait("sounds/point.raw");
+    image_draw(0, 0, bg);
+
+    x = rand() % 9 + 1; y = 0;
+    dx = rand() % 3 + 1; dy = 1;
+
+    while (1) {
+        image_draw(x, y, sprite);
+        screen_show_buffer();
+
+        if (y + h == SCREEN_HEIGHT && dy >= 0) dy *= -0.8;
+        if (x + w == SCREEN_WIDTH || x == 0) {
+            x = rand() % 9 + 1; y = 0;
+            dx = rand() % 3 + 1; dy = 1;
+            if (rand() % 2) {
+                x = SCREEN_WIDTH - w - x;
+                dx *= -1;
+            }
+        }
+        x += dx; x = MIN(x, SCREEN_WIDTH - w); x = MAX(x, 0);
+        y += dy; y = MIN(y, SCREEN_HEIGHT - h);
+        dy += 1;
+
+        for (i = 0; i < 1000000; i++);
+
+        if ((btn_ignore = btn_read()) > 0)
+            return;
+    }
 }
