@@ -15,6 +15,7 @@
 #define SND_SIZE    16
 
 int snd_device;
+pthread_t snd_cur_thread;
 
 void *snd_play_loop(void *arg);
 
@@ -33,8 +34,12 @@ void snd_init()
 
 void snd_play(char *filename)
 {
-    pthread_t thread;
-    pthread_create(&thread, 0, snd_play_loop, filename);
+    pthread_create(&snd_cur_thread, 0, snd_play_loop, filename);
+}
+
+void snd_play_wait(char *filename)
+{
+    snd_play_loop(filename);
 }
 
 void *snd_play_loop(void *arg)

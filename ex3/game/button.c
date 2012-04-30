@@ -6,6 +6,7 @@
 #include "button.h"
 
 int btn_file;
+int btn_ignore = 0;
 
 void btn_init()
 {
@@ -21,9 +22,28 @@ char btn_read()
 
 int btn_is_pushed(int i)
 {
+    int is_pushed;
     volatile int j;
-    if ((btn_read() & (1 << i)) == 0)
+
+    is_pushed = (btn_read() & (1 << i)) != 0;
+
+    if ((btn_ignore & (1 << i)) != 0) {
+        if (!is_pushed) {
+            btn_ignore &= ~(1 << i);
+        }
         return 0;
+    }
+
+    if (!is_pushed)
+        return 0;
+
     for (j = 0; j < 1000; j++);
-    return (btn_read() & (1 << i)) != 0;
+
+    is_pushed = (btn_read() & (1 << i)) != 0;
+
+    if (!is_pushed)
+        return 0;
+
+    btn_ignore |= 1 << i;
+    return 1;
 }
