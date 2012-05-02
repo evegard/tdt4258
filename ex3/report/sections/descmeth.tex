@@ -1,2 +1,29 @@
 \section{Description and Methodology}
 
+Roughly, the assignment consisted of three parts: \emph{uploading Linux}
+to the microcontroller board, \emph{developing a kernel driver} for the
+LEDs and buttons, and \emph{developing a game} utilizing these.
+
+Developing the game was the most time-consuming part of the assignment.
+This part consisted of several components that had to be developed. In
+addition to the game logic and the user interface, the game needed
+support for rendering to the screen, playing sounds, importing images,
+reading hardware buttons and controlling LEDs.
+
+\subsection{Installing Linux}
+
+To get Linux to run on the microcontroller, a boot loader is needed in
+the Flash memory as the first stage of the booting process. To upload
+this boot loader, \texttt{avr32-program} was used as in the previous
+assignments.
+
+The boot loader will look for a Linux kernel on the board's memory
+card. The memory card thus needs to contain a valid file system, as well
+as the root file system for the OS to boot into. This was all supplied
+in an image file that was ready to be written to the memory card.
+Writing the image file to the card was done using \texttt{dd} on the
+lab computer.
+
+\subsection{Developing the kernel driver}
+
+\subsection{Developing the game}
