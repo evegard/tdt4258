@@ -26,7 +26,71 @@ lab computer.
 
 \subsection{Developing the kernel driver}
 
+Our kernel driver follows the required steps listed in the compendium
+\cite{comp}. The skeleton code was extended to perform the following
+initialization steps:
+
+\begin{itemize}
+    \item Allocate a device number for a character device with
+        \texttt{alloc\_chrdev\_region}.
+    \item Request exclusive access to the I/O memory areas with
+        \texttt{request\_region}.
+    \item Set I/O registers to initialize LED output.
+    \item Set I/O registers to initialize button input.
+    \item Register the character device with \texttt{cdev\_add}.
+\end{itemize}
+
+Upon read requests to the device, the driver returns a single byte
+representing the current data values on the button pins. Upon write
+requests, the driver reads a single byte and updates the eight LED pins
+accordingly.
+
+As the PIO C port is reserved for other uses in this exercise, we needed
+to use the higher bits of the PIO B port for the LEDs. However, the
+mapping between bit positions in this I/O register and the physical pins
+is not one-to-one. Thus, we needed to convert the physical pins to
+register bits with some extra logic. The code for this is shown in
+figure \ref{lst:io_mapping}.
+
+\input{figures/io_mapping}
+
+The ``protocol'' described for our device driver is thus very simple --
+a single byte is the unit for both read and write operations. This
+removes the need for any buffering in the driver, as well as making the
+code running in kernel mode as simple as possible. The flip side is that
+the application code requires more logic to handle the devices.
+
 \subsection{Developing the game}
+
+As mentioned in the introduction, the game consists of several components. The
+game logic and the hardware interfacing (screen, sound, buttons and
+LEDs) were developed in parallel. Afterwards, the user interface logic
+connecting the two halves was developed. This has led to a code base
+with a clean seperation of the different parts.
+
+\subsubsection{Rendering to the screen}
+
+Support for rendering to the screen is implemented in \texttt{screen.c}
+and \texttt{screen.h}. An initialization function opens the framebuffer
+device at \texttt{/dev/fb0} and uses memory mapping to allow this device
+to be used as a regular C array. An in-memory array of the same size is
+allocated to function as a back buffer. This is to implement double
+buffering, as the image will flicker otherwise.
+
+A custom C structure, \texttt{color\_t}, is defined, that abstracts away
+the makeup of the pixels in the framebuffer array as colors with red,
+green and blue components. To plot a pixel, the macro
+\texttt{screen\_put} is used (see figure \ref{lst:screen_put}). This is
+implemented as a macro for efficiency reasons.
+
+\input{figures/screen_put}
+
+The function \texttt{screen\_show\_buffer} shows the back buffer on the
+screen. In addition, there are several other \texttt{screen} functions
+that mainly deal with drawing shapes like filled rectangles and lines.
+
+\subsubsection{Importing images}
+
 
 \subsubsection{Sound}
 We quickly decided that a sound clip with actual music would sound better than our rendition of ``Itsy Bitsy Spider'', and decided upon the beginning of the Walkürenritt from Richard Wagner's opera Der Ring des Nibelungen, as it sounds sufficiently dramatic. The source file for the sound clip was found in the archives at Textfiles.com, and converted to raw format using Audacity. Audacity was also used to generate sounds where we decided not to use sound clips.
@@ -35,3 +99,28 @@ We quickly decided that a sound clip with actual music would sound better than o
 For our graphics format, we chose uncompressed 24-bit \emph{Truevision TGA} format (also known as TARGA format) for its ease of use and because it is not heavily patented. Truevision TGA is a raster graphics file format. Truevision TGA files have an 18 byte header, of which the last 10 bytes are the image specification. We extracted the image dimensions and format from this to find the exact location and size of the image data, and discarded the other information. We then rendered the raw image data directly. %DERP THIS ISN'T TOO DETAILED HALP.
 
 We encountered one problem: Truevision TGA format is little-endian, and Linux on AVR32 is big-endian. Thankfully, the scope of the problem was limited to the header of the TGA file, as the image data is given in individual bytes. In our case, the only multiple-byte information we needed was the image height and width, both given in two bytes. We solved this by swapping the upper eight and lower eight bits through bit-shifting.
+
+\subsubsection{Playing sounds}
+
+\subsubsection{Reading buttons}
+
+Reading from the hardware buttons is implemented in \texttt{button.c}
+and \texttt{button.h}. Initialization is simply to open the character
+device at \texttt{/dev/stkboard}, which is the driver implemented in the
+previous part of this exercise. The function \texttt{btn\_read} returns
+a character containing the current state of all of the eight buttons.
+This is done by reading a character from \texttt{/dev/stkboard}.
+
+The function \texttt{btn\_is\_pushed} implements further functionality to
+correct unwanted button behaviour. Firstly, it reads the button state
+\emph{twice}, with a sleep loop inbetween. This is to alleviate the
+bouncing effects described in the first exercise.
+
+Secondly, the function only returns true for a button \emph{once} per
+button push. That is, once a button is pushed down and this is returned
+from the function, the function will no longer repeat this as long as
+the button is kept pushed down. This is achieved by maintaining a
+\texttt{btn\_ignore} variable that masks out button pushes already
+returned.
+
+\subsubsection{Controlling LEDs}

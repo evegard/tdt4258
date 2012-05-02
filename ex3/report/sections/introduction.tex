@@ -1,2 +1,60 @@
 \section{Introduction}
 
+The objective of this task is that the group members will get a better
+understanding in how device drivers in Linux work, how to implement a
+character device driver in C for the buttons and LEDs on the STK1000
+board and experience on how to use device drivers in a relatively large
+C program by making a game named {\em Scorched Land}. The task given to
+us in the course Microcontroller System Design (TDT4258) to learn these
+things was to \\
+``{\em Make a driver for the use of buttons and LEDs on the STK1000. It
+should be implemented as a kernel module. [\ldots] Complete the game.
+Use \texttt{/dev/fb0} directly for writing to LCD screen. Use
+\texttt{/dev/dsp} for producing the sound. Use your own driver for
+reading the status of the buttons on STK1000. Use also your own driver
+for the control of the LED diodes.  These can be used, for example, to
+show how many lives a player has left or some other status information
+about the game. Or you can just blink in some nice repetitive
+way.}''\cite{comp}
+
+As the specifications on how the driver exactly should work were left
+unspecified, we decided to let the logic be as simple as possible:
+Reading a char from the \texttt{/dev/stkboard} module gives information
+about which buttons are pushed, and writing a char to the device will
+set the LEDs in the configuration specified. The proper specification is
+written in \ldots % TODO.
+\begin{comment}
+\begin{itemize} % Q: Move to descmeth.
+\item Reading one char from the device will give you the bitmask of the
+buttons pressed - for instance would 129 (\texttt{1000 0001}) mean that
+only button 7 and 0 are pushed. 
+\item Writing one char to the device will write the bitmask of the LEDs
+in the same way you read the buttons pressed from the device - if you
+write the char 66 (\texttt{0100 0010}) to the device, then LED 6 and 1
+will be lit while the others will be turned off if they aren't already
+off. Notice that there's no way to read the LEDs from the device, as
+this was not a specification requirement. To do that in a program, we
+would save the current configuration of the LEDs we just wrote.
+\end{itemize}
+\end{comment}
+
+The game was developed by splitting the work in three: One to work on
+integrating the device drivers with the GUI and the game, one to work on
+creating and finding sounds and graphics as well as implementing code to
+properly load those resouces, and one to work on the game logic. By
+designing an API for image, sounds and game logic, the code became
+very modular and it became very simple to test and debug each module on
+its own.
+
+Apart from the requirement that the game should use the driver we made,
+\texttt{/dev/fb0} and \texttt{/dev/dsp}, the game logic was not
+specified. The game logic was thus developed from the images in the
+compendium\cite{comp} and what we already knew about the military
+strategy known as scorched earth: The game designed is a turn-based game
+where a soldier tries to get up to a tank, and the tank tries to block
+the soldier's way by firing its gun to scorch the earth or to hit the
+soldier. If there's no way for the soldier to get up to the tank or the
+tank manages to hit the soldier, the tank wins. Otherwise, if the
+soldier manages to get up to the tank, the soldier wins. A more detailed
+specification is listed in the \ldots
+
