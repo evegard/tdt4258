@@ -64,7 +64,7 @@ the application code requires more logic to handle the devices.
 
 As mentioned introductory, the game consists of several components. The
 game logic and the hardware interfacing (screen, sound, buttons and
-LEDs) were developed in parallell. Afterwards, the user interface logic
+LEDs) were developed in parallel. Afterwards, the user interface logic
 connecting the two halves was developed. This has led to a code base
 with a clean seperation of the different parts.
 
@@ -91,5 +91,26 @@ that mainly deal with drawing shapes like filled rectangles and lines.
 
 \subsubsection{Importing images}
 \subsubsection{Playing sounds}
+
 \subsubsection{Reading buttons}
+
+Reading from the hardware buttons is implemented in \texttt{button.c}
+and \texttt{button.h}. Initialization is simply to open the character
+device at \texttt{/dev/stkboard}, which is the driver implemented in the
+previous part of this exercise. The function \texttt{btn\_read} returns
+a character containing the current state of all of the eight buttons.
+This is done by reading a character from \texttt{/dev/stkboard}.
+
+The function \texttt{btn\_is\_pushed} implements further functionality to
+correct unwanted button behaviour. Firstly, it reads the button state
+\emph{twice}, with a sleep loop inbetween. This is to alleviate the
+bouncing effects described in the first exercise.
+
+Secondly, the function only returns true for a button \emph{once} per
+button push. That is, once a button is pushed down and this is returned
+from the function, the function will no longer repeat this as long as
+the button is kept pushed down. This is achieved by maintaining a
+\texttt{btn\_ignore} variable that masks out button pushes already
+returned.
+
 \subsubsection{Controlling LEDs}
