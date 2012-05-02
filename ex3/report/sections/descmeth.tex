@@ -62,7 +62,7 @@ the application code requires more logic to handle the devices.
 
 \subsection{Developing the game}
 
-As mentioned introductory, the game consists of several components. The
+As mentioned in the introduction, the game consists of several components. The
 game logic and the hardware interfacing (screen, sound, buttons and
 LEDs) were developed in parallel. Afterwards, the user interface logic
 connecting the two halves was developed. This has led to a code base
@@ -90,6 +90,16 @@ screen. In addition, there are several other \texttt{screen} functions
 that mainly deal with drawing shapes like filled rectangles and lines.
 
 \subsubsection{Importing images}
+
+
+\subsubsection{Sound}
+We quickly decided that a sound clip with actual music would sound better than our rendition of ``Itsy Bitsy Spider'', and decided upon the beginning of the Walkürenritt from Richard Wagner's opera Der Ring des Nibelungen, as it sounds sufficiently dramatic. The source file for the sound clip was found in the archives at Textfiles.com, and converted to raw format using Audacity. Audacity was also used to generate sounds where we decided not to use sound clips.
+
+\subsubsection{Graphics}
+For our graphics format, we chose uncompressed 24-bit \emph{Truevision TGA} format (also known as TARGA format) for its ease of use and because it is not heavily patented. Truevision TGA is a raster graphics file format. Truevision TGA files have an 18 byte header, of which the last 10 bytes are the image specification. We extracted the image dimensions and format from this to find the exact location and size of the image data, and discarded the other information. We then rendered the raw image data directly. %DERP THIS ISN'T TOO DETAILED HALP.
+
+We encountered one problem: Truevision TGA format is little-endian, and Linux on AVR32 is big-endian. Thankfully, the scope of the problem was limited to the header of the TGA file, as the image data is given in individual bytes. In our case, the only multiple-byte information we needed was the image height and width, both given in two bytes. We solved this by swapping the upper eight and lower eight bits through bit-shifting.
+
 \subsubsection{Playing sounds}
 
 \subsubsection{Reading buttons}
