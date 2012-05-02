@@ -26,4 +26,70 @@ lab computer.
 
 \subsection{Developing the kernel driver}
 
+Our kernel driver follows the required steps listed in the compendium
+\cite{comp}. The skeleton code was extended to perform the following
+initialization steps:
+
+\begin{itemize}
+    \item Allocate a device number for a character device with
+        \texttt{alloc\_chrdev\_region}.
+    \item Request exclusive access to the I/O memory areas with
+        \texttt{request\_region}.
+    \item Set I/O registers to initialize LED output.
+    \item Set I/O registers to initialize button input.
+    \item Register the character device with \texttt{cdev\_add}.
+\end{itemize}
+
+Upon read requests to the device, the driver returns a single byte
+representing the current data values on the button pins. Upon write
+requests, the driver reads a single byte and updates the eight LED pins
+accordingly.
+
+As the PIO C port is reserved for other uses in this exercise, we needed
+to use the higher bits of the PIO B port for the LEDs. However, the
+mapping between bit positions in this I/O register and the physical pins
+is not one-to-one. Thus, we needed to convert the physical pins to
+register bits with some extra logic. The code for this is shown in
+figure \ref{lst:io_mapping}.
+
+\input{figures/io_mapping}
+
+The ``protocol'' described for our device driver is thus very simple --
+a single byte is the unit for both read and write operations. This
+removes the need for any buffering in the driver, as well as making the
+code running in kernel mode as simple as possible. The flip side is that
+the application code requires more logic to handle the devices.
+
 \subsection{Developing the game}
+
+As mentioned introductory, the game consists of several components. The
+game logic and the hardware interfacing (screen, sound, buttons and
+LEDs) were developed in parallell. Afterwards, the user interface logic
+connecting the two halves was developed. This has led to a code base
+with a clean seperation of the different parts.
+
+\subsubsection{Rendering to the screen}
+
+Support for rendering to the screen is implemented in \texttt{screen.c}
+and \texttt{screen.h}. An initialization function opens the framebuffer
+device at \texttt{/dev/fb0} and uses memory mapping to allow this device
+to be used as a regular C array. An in-memory array of the same size is
+allocated to function as a back buffer. This is to implement double
+buffering, as the image will flicker otherwise.
+
+A custom C structure, \texttt{color\_t}, is defined, that abstracts away
+the makeup of the pixels in the framebuffer array as colors with red,
+green and blue components. To plot a pixel, the macro
+\texttt{screen\_put} is used (see figure \ref{lst:screen_put}). This is
+implemented as a macro for efficiency reasons.
+
+\input{figures/screen_put}
+
+The function \texttt{screen\_show\_buffer} shows the back buffer on the
+screen. In addition, there are several other \texttt{screen} functions
+that mainly deal with drawing shapes like filled rectangles and lines.
+
+\subsubsection{Importing images}
+\subsubsection{Playing sounds}
+\subsubsection{Reading buttons}
+\subsubsection{Controlling LEDs}

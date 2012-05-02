@@ -1,0 +1,9 @@
+\begin{figure}[ht]
+\centering
+\lstset{language=C,basicstyle=\ttfamily,numbers=left,firstnumber=27,breaklines=true}
+\begin{lstlisting}
+#define screen_put(x, y, color) (screen_buffer[(y) * SCREEN_WIDTH + (x)] = (color))
+\end{lstlisting}
+\caption{Pixel plotting macro in \texttt{game/screen.c}.}
+\label{lst:screen_put}
+\end{figure}

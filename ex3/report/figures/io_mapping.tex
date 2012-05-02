@@ -1,0 +1,17 @@
+\begin{figure}[ht]
+\centering
+\lstset{language=C,basicstyle=\ttfamily,numbers=left,firstnumber=28}
+\begin{lstlisting}
+j = i;
+switch (i) {
+    case 3:
+    case 4:
+    case 5:
+    case 6: j += 2; break;
+    case 7: j = 22; break;
+}   
+\end{lstlisting}
+\caption{Logic in \texttt{driver/led.c} for I/O pin mapping. \texttt{i}
+is the requested LED, \texttt{j} is the corresponding I/O pin.}
+\label{lst:io_mapping}
+\end{figure}
