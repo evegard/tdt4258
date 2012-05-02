@@ -1,2 +1,34 @@
 \section{Introduction}
 
+The objective of this task is that the group members will get a better
+understanding in how device drivers in Linux work, how to implement a
+character device driver in C for the buttons and LEDs on the STK1000
+board and experience on how to use device drivers in a relatively large
+C program. The task given to us in the course Microcontroller System
+Design (TDT4258) to learn these things was to ``Make a driver for the
+use of buttons and LEDs on the STK1000. It should be implemented as a
+kernel module. [\ldots] Complete the game. Use /dev/fb0 directly for
+writing to LCD screen. Use /dev/dsp for producing the sound. Use your
+own driver for reading the status of the buttons on STK1000. Use also
+your own driver for the control of the LED diodes. These can be used,
+for example, to show how many lives a player has left or some other
+status information about the game. Or you can just blink in some nice
+repetitive way.''\cite{comp}
+
+As the specifications on how the driver exactly should work were left
+unspecified, we decided to let the logic be as simple as possible:
+\begin{itemize}
+\item Reading one char from the device will give you the bitmask of the
+      buttons pressed - for instance would 129 (1000 0001) mean that only
+      button 7 and 0 are pushed. 
+\item Writing one char to the device will write the bitmask of the LEDs
+      in the same way you read the buttons pressed from the device - if
+      you write the char 66 (0100 0010) to the device, then LED 6 and 1
+      will be lit while the others will be turned off if they aren't
+      already off. Notice that there's no way to read the LEDs from the
+      device, as this was not a specification listed. To do that in a
+      program, we would save the current configuration of the LEDs we
+      just wrote.
+\end{itemize}
+
+%TODO More about... stuff.
