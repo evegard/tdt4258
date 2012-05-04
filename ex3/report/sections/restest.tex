@@ -6,7 +6,7 @@ were accurate, as well as component testing of individual code
 components.
 
 \subsection{Buttons and LEDs}
-As the button and LED implementation from assingments 1 and 2 was more
+As the button and LED implementation from assignments 1 and 2 was more
 or less complete, we tested it first, as it only needed minor
 modifications to it to work for this assingment.  We tested LED
 functionality by using the following commands: 
@@ -20,14 +20,16 @@ to find the hexadecimal representation of the bitmask of the buttons
 pressed. This test was successful.
 
 \subsection{Graphics}
-We experimented first with rendering the whole screen in one colour.
+The graphics part of the assignment did not have any formal testing structure, but rather consisted of successive experiments in making it work. 
+We first tried filling the whole screen with one color, with success.
 After this, we experimented with drawing lines and boxes on the screen,
-subsequently implementing movement. Visual testing showed that the
-rendering was successful, but flickered badly.  Double-buffering seems
-to have solved the flickering problem. % TODO: Expand this.
+subsequently implementing movement. Both experiments were successful. Visual testing showed that the
+rendering worked, but the screen flickered badly. Double-buffering solved the flickering problem, and everything rendered as desired.
+After this, we experimented with rendering image files and simply checking to see if they rendered correctly on the screen. First, things didn't go so well, and the image did not render correctly. As it turned out, the C compiler added another byte of space in the tga_header_t struct, because it wants \texttt{short} values to be placed on 2- or 4-byte boundaries. However, the structure we read from disk did not have these boundaries, and the values we read from the structures were off by one byte. Once this was rectified, the image rendered almost correctly. Our intro image has a grey background and red-orange text, but during our test, we found the colors were reversed, and the title text was blue instead. As it turns out, the color values are in the order of \emph{blue, green, red}, not \emph{red, green, blue} as expected. Once the red and the blue switched place, the images rendered correctly.
+Finally, we implemented the bouncing soldier, and changed the parameters until we found it behaved as desired.
 
 \subsection{Sound}
-Seeing as how we'd already implemented sound in the previous assignment, implementing it this time was a fairly simple job. We did not start the sound module until after we were told about the ALSA muting problem, so implementing sound was fairly uneventful. To check whether the sounds performed correctly, they were played back on the STK1000 board, as well as on a laptop computer to compare. It soon became apparent that the files were being played back roughly twice as fast as they should. A quick check of the sampling rate of the files and the sound settings in \texttt{/dev/dsp} showed that the sound settings had a double rate. Once this was fixed, the sound performed correctly.
+Seeing as how we'd already implemented sound in the previous assignment, implementing it this time was a fairly simple job. We did not start the sound module until after we were told about the ALSA muting problem, so implementing sound was fairly uneventful. To check whether the sounds performed correctly, they were played back on the STK1000 board, as well as on a laptop computer to compare. It soon became apparent that the files were being played back roughly twice as fast as they should. A quick check of the sampling rate of the files and the sound settings in \texttt{/dev/dsp} showed that the sound settings were double rate compared to the sound files. Once this was fixed, the sound performed correctly.
 
 \subsection{Game logic}
 Seeing as how testing the game logic on the board required near-perfect
@@ -37,8 +39,9 @@ terminal version of the game, using the same game logic, as described in
 changes in quick succession without being hampered by testing the logic on the STK1000 board.
 Using this tool, we performed successive tests and improvements. All tests were performed by doing a normal run of the test program and comparing it to the logic rules laid out in \ref{subsec:game-logic}. We started out by making sure the shooting function worked as it should.
 Our first test failed. The shots appeared to originate from the wrong corner in our first test run of the game. We rectified this by flipping the calculated x position. 
-Once this was done, we ran a second test. It too, failed. Although the first problem was resolved, we discovered that it was impossible to hit the rightmost tiles in the grid. After some searching, we discovered that we flipped the x position before we cast the floating point number to an int, leading to it rounding the wrong way, excluding a whole column of tiles. We fixed this by casting to an int first, and then flipping the x position.
-At this point, the shooting function performed as it should, and we ran a third test. It failed, because the tank would be declared winner after only one shot, even though the proper winning conditions were not met. A short investigation revealed that the depth-first search that tests for whether there is a path between the soldier and the tank (no path means that the tank has won) had a simple logical error, where TRUE and FALSE had been inverted. We fixed this, and tested again.
+Once this was done, we ran a second test. It too, failed. Although the first problem was resolved, we discovered that it was impossible to hit the rightmost tiles in the grid. After some searching, we discovered that we flipped the x position before we cast the floating point number to an integer, leading to it rounding the wrong way, excluding a whole column of tiles. We fixed this by casting to an integer first, and then flipping the x position.
+At this point, the shooting function performed as it should, and we ran a third test. It failed, because the tank would be declared winner after only one shot, even though the proper winning conditions were not met. A short investigation revealed that the depth-first search that tests for whether there is a path between the soldier and the tank (no path means that the tank has won) had a simple logical error, where \texttt{TRUE} and \texttt{FALSE} had been inverted. We fixed this, and tested again.
 Our fourth test was successful, as the game logic performed as expected and according to the rules laid out.
+
 \subsection{Complete test}
-% Oi, her bør det kanskje skrives noe?
+Finally, once the individual components performed as they should, we tested the game as a whole on the STK1000 board. The game performed well, with an exception of a minor bouncing problem with the buttons, as outlined in our first assignment. Once debouncing was implemented, the game performed exactly to specification.
