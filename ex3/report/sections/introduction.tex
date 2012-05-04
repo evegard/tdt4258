@@ -23,20 +23,6 @@ Reading a char from the \texttt{/dev/stkboard} module gives information
 about which buttons are pushed, and writing a char to the device will
 set the LEDs in the configuration specified. The proper specification is
 written in \ref{subsec:developing-the-driver}.
-\begin{comment}
-\begin{itemize} % Q: Move to descmeth.
-\item Reading one char from the device will give you the bitmask of the
-buttons pressed - for instance would 129 (\texttt{1000 0001}) mean that
-only button 7 and 0 are pushed. 
-\item Writing one char to the device will write the bitmask of the LEDs
-in the same way you read the buttons pressed from the device - if you
-write the char 66 (\texttt{0100 0010}) to the device, then LED 6 and 1
-will be lit while the others will be turned off if they aren't already
-off. Notice that there's no way to read the LEDs from the device, as
-this was not a specification requirement. To do that in a program, we
-would save the current configuration of the LEDs we just wrote.
-\end{itemize}
-\end{comment}
 
 The game was developed by splitting the work in three: One to work on
 integrating the device drivers with the GUI and the game, one to work on
