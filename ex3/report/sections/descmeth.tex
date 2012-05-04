@@ -269,3 +269,23 @@ implementaion, we found and solved bugs in regards to correctly placing
 scorched land tiles from a bullet shot. We also found out that we forgot to
 flip the x-position, and implemented the code needed to flip it.
 
+\subsection{Implementing the user interface}
+
+With all the low level support functions in place, as well as the game
+logic itself, a user interface tying all this together was needed. The
+user interface is implemented in the files \texttt{ui.c} and
+\texttt{ui.h}.
+
+The user interface is a state machine that changes between the following
+states:
+
+\begin{enumerate}
+    \item Intro screen.
+    \item Gameplay, soldier's turn to move.
+    \item Gameplay, tank's turn to select shooting angle.
+    \item Gameplay, tank's turn to select shooting strength.
+    \item Game over screen.
+\end{enumerate}
+
+The user interface runs in an infinite loop, rendering to the screen,
+reading input, controlling the sound and updating the game state.
