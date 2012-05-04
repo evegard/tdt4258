@@ -75,7 +75,7 @@ and \texttt{screen.h}. An initialization function opens the framebuffer
 device at \texttt{/dev/fb0} and uses memory mapping to allow this device
 to be used as a regular C array. An in-memory array of the same size is
 allocated to function as a back buffer. This is to implement double
-buffering, as the image will flicker otherwise.
+buffering, as the image flickers otherwise.
 
 A custom C structure, \texttt{color\_t}, is defined, that abstracts away
 the makeup of the pixels in the framebuffer array as colors with red,
@@ -94,14 +94,11 @@ that mainly deal with drawing shapes like filled rectangles and lines.
 For our graphics format, we chose uncompressed 24-bit \emph{Truevision
 TGA} format (also known as TARGA format) for its ease of implementation
 and because it is not heavily patented. Truevision TGA is a raster
-graphics file format. Truevision TGA files have an 18 byte header, of
-which the last 10 bytes are the image specification.
+graphics file format with options for 8 to 32 bits of precision per pixel, with up to 24 bits of RGB color and an additional 8 bit alpha channel, and offers the option of lossless RLE compression. Truevision TGA files have an 18 byte header, of which the last 10 bytes are the image specification. Additional image information (including metadata) may be added after the header if desired, but as we had no use of this, we chose not to.
 
 We extracted the image dimensions and format from this to find the exact
 location and size of the image data, and discarded the other
-information. We then rendered the raw image data directly.
-
-% TODO: Expand
+information. We then rendered the raw image data directly, pixel for pixel, as can be seen in \texttt{image.c}, with one exception. We wished to make partially transparent images to make overlaying seamless (as in the case of the little soldier and the tank), but exporting 32-bit Truevision TGA images with an 8-bit alpha channel proved difficult with the available tools. Instead, we substituted a bright purple colour not used elsewhere (printer's magenta, hexadecimal \texttt{FF00FF}) for the transparency, and ignored this during rendering, as can be seen in the \texttt{image\_draw} function in \texttt{image.c}.
 
 We encountered one problem: Truevision TGA format is little-endian, and
 Linux on AVR32 is big-endian. Thankfully, the scope of the problem was
@@ -109,7 +106,7 @@ limited to the header of the TGA file, as the image data is given in
 individual bytes. In our case, the only multiple-byte information we
 needed was the image height and width, both given in two bytes. We
 solved this by swapping the upper eight and lower eight bits through
-bit-shifting.
+bit-shifting, as can be seen in the \texttt{image\_load} function in \texttt{image.c}
 
 \subsubsection{Playing sound effects}
 
@@ -118,7 +115,7 @@ our rendition of ``Itsy Bitsy Spider'' from the previous exercise, and
 decided upon the beginning of the Walkürenritt from Richard Wagner's
 opera Der Ring des Nibelungen, as it sounds more dramatic. The source
 file for the sound clip was found in the archives at Textfiles.com, and
-converted to raw format using Audacity. Audacity was also used to
+converted to a suitable format using Audacity. Audacity was also used to
 generate sounds where we decided not to use sound clips.
 
 To make playback simple, we exported the sounds in raw sample format
@@ -177,12 +174,12 @@ work:
             and down if and only if the tile the soldier wants to move
             to is within the grid size and the tile is not scorched land.
     \item The tank is stationary, and can shoot a gun which will scorch
-            the land. The player gives an angle and a strenght on the
-            shot, and the game will calculate where the shot ends up at.
-    \item The soldier will win if he gets to a tile which is
+            the land. The player gives an angle and a strength to the
+            shot, and the game will calculate where it hits, if it hits the grid. It is possible to overshoot the grid.
+    \item The soldier wins if he gets to a tile which is
             occupied by the tank.
-    \item The tank will win if he hits the soldier, or if the hit makes
-            it impossible to reach the tank for the soldier.
+    \item The tank wins if he hits the soldier, or if the hit makes
+            the tank impossible to reach from the soldier's location.
 \end{itemize}
 
 We decided to omit details such as grid size and whether the game is
@@ -230,10 +227,10 @@ specified direction you want the soldier to go to, if possible. The
 function will check whether the position is ok to move to, and if so,
 will move the soldier from its current position to its next. Finally,
 the functions returns a reasonable response which gives the GUI
-possibility to properly give error messages if wanted.
+the option to properly give error messages if desired.
 
 After the initial implementation, a terminal version of the game was
-created to test the functionality and check that all worked as intended.
+created to test the functionality and check that everything worked as intended.
 The terminal version can be compiled and run by running the command 
 \verb|make test && test/sc_land| in the \texttt{game} folder, or
 through \verb|make && ./sc_land| in the \texttt{game/test} folder.
@@ -241,9 +238,9 @@ through \verb|make && ./sc_land| in the \texttt{game/test} folder.
 \input{figures/terminal-screenshot-0}
 
 By implementing a terminal version, we could test the implementation
-much faster and debug with the "GNU Debugger" available, which give a
-much better debug support than the STK1000 board does. From the
+much faster and debug with the "GNU Debugger" available, which provides 
+much better debugging support than the STK1000 board does. From the
 implementaion, we found and solved bugs in regards to correctly placing
-scorched land from a bullet shot. We also found out that we forgot to
+scorched land tiles from a bullet shot. We also found out that we forgot to
 flip the x-axis, and implemented the code needed to flip it.
 
