@@ -1,2 +1,20 @@
 \section{Results and tests}
 
+This assignment did not lend itself well to simple testing, due to the complexity of the finished product. Instead, we had to resort to visual and auditory testing to check that image rendering and sound rendering were accurate, as well as component testing of individual code components.
+
+
+\subsection{Buttons and LEDs}
+As the button and LED implementation from assingments 1 and 2 was more or less complete, we tested it first, as it only needed minor modifications to it to work for this assingment.
+We tested LED functionality by using the following commands:
+\texttt{echo -ne "\\x55" > /dev/stkboard} and \texttt{echo -ne "\\xaa" > /dev/stkboard}, expecting the even-numbered and odd-numbered LEDs to light up, respectively as we did this. This test was successful.
+We then tested button reading functionality by using \texttt{hd /dev/stkboard} and reading the results in the terminal as we pressed buttons. We expected to find the hexadecimal representation of the bitmask of the buttons pressed. This test was successful.
+\subsection{Graphics}
+We experimented first with rendering the whole screen in one colour. After this, we experimented with drawing lines and boxes on the screen, subsequently implementing movement. Visual testing showed that the rendering was successful, but flickered badly.
+Double-buffering seems to have solved the flickering problem. % TODO: Expand this.
+\subsection{Sound}
+% TODO: Write this.
+\subsection{Game logic}
+Seeing as how testing the game logic on the board required near-perfect functionality from the STK1000 board, we decided to make a simple terminal version of the game, using the same game logic, as described in \ref{subsec:game-logic}. 
+% TODO: Expand this with notes from talking to JN.
+
+\subsection{Complete test}
