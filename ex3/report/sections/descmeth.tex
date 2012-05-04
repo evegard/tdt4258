@@ -140,6 +140,12 @@ and \texttt{sound.h}. As inconsistencies in sampling rates became
 apparent during our test runs, we edited the sound clips to provide
 consistent sampling rates.
 
+Writing samples to \texttt{/dev/dsp} is performed in a continuous loop.
+The write requests to the sound device will block until it's time for
+new samples. However, this sample processing loop has to be disconnected
+from the game's main loop. Thus, the sound loop runs in its own thread.
+This functionality is provided by the \texttt{pthreads} library.
+
 \subsubsection{Reading buttons}
 
 Reading from the hardware buttons is implemented in \texttt{button.c}
@@ -163,9 +169,12 @@ returned.
 
 \subsubsection{Controlling LEDs}
 
-\texttt{led.c} and \texttt{led.h} implements LED control. As with the
+\texttt{led.c} and \texttt{led.h} implement LED control. As with the
 button support, the initialization step is to open the
-\texttt{/dev/stkboard} device.
+\texttt{/dev/stkboard} device. The code maintains a global variable
+containing the state of all the LEDs. Updates to the LED state is
+written to the device driver by \texttt{led\_update}. The rest of the
+code is re-used from the previous exercise.
 
 \subsubsection{Implementing the game logic}
 \label{subsec:game-logic}
