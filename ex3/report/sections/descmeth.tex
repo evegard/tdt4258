@@ -112,7 +112,7 @@ bit-shifting, as can be seen in the \texttt{image\_load} function in \texttt{ima
 
 We decided that a sound clip with actual music would sound better than
 our rendition of ``Itsy Bitsy Spider'' from the previous exercise, and
-decided upon the beginning of the Walkürenritt from Richard Wagner's
+decided on the beginning of the Walkürenritt from Richard Wagner's
 opera Der Ring des Nibelungen, as it sounds more dramatic. The source
 file for the sound clip was found in the archives at Textfiles.com, and
 converted to a suitable format using Audacity. Audacity was also used to
@@ -122,7 +122,7 @@ To make playback simple, we exported the sounds in raw sample format
 with parameters that matched those of the \texttt{/dev/dsp} device. To
 play sounds, we then only need to write the samples from the sound files
 directly into \texttt{/dev/dsp}. This is implemented in \texttt{sound.c}
-and \texttt{sound.h}.
+and \texttt{sound.h}. As inconsistencies in sampling rates became apparent during our test runs, we edited the sound clips to provide consistent sampling rates.
 
 \subsubsection{Reading buttons}
 
