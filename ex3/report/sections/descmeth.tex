@@ -68,6 +68,8 @@ LEDs) were developed in parallel. Afterwards, the user interface logic
 connecting the two halves was developed. This has led to a code base
 with a clean seperation of the different parts.
 
+\input{figures/gamescr0}
+
 \subsubsection{Rendering to the screen}
 
 Support for rendering to the screen is implemented in \texttt{screen.c}
@@ -89,6 +91,8 @@ The function \texttt{screen\_show\_buffer} shows the back buffer on the
 screen. In addition, there are several other \texttt{screen\_[...]}
 functions that mainly deal with drawing shapes like filled rectangles
 and lines.
+
+\input{figures/gamescr1}
 
 \subsubsection{Importing image files for graphics}
 
@@ -121,6 +125,8 @@ need is the image height and width, both given in two bytes. We solve
 this by swapping the upper eight and lower eight bits through
 bit-shifting, as can be seen in the \texttt{image\_load} function in
 \texttt{image.c}
+
+\input{figures/gamescr2}
 
 \subsubsection{Playing sound effects}
 
@@ -166,6 +172,8 @@ from the function, the function will no longer repeat this as long as
 the button is kept pushed down. This is achieved by maintaining a
 \texttt{btn\_ignore} variable that masks out button pushes already
 returned.
+
+\input{figures/gamescr3}
 
 \subsubsection{Controlling LEDs}
 
@@ -289,3 +297,9 @@ states:
 
 The user interface runs in an infinite loop, rendering to the screen,
 reading input, controlling the sound and updating the game state.
+
+Impressions of the user interface are shown in figures
+\ref{fig:gamescr0}, \ref{fig:gamescr1}, \ref{fig:gamescr2},
+\ref{fig:gamescr3} and \ref{fig:gamescr4} throughout the report.
+
+\input{figures/gamescr4}
