@@ -16,9 +16,19 @@ typedef struct color {
     char r;
 } color_t;
 
+/*
+ * The memory-mapped framebuffer device.
+ */
 extern color_t *screen;
+
+/*
+ * Our back buffer for double-buffering.
+ */
 extern color_t *screen_buffer;
 
+/*
+ * Predefined colors.
+ */
 extern color_t color_red, color_green, color_blue, color_purple,
                color_black;
 /*

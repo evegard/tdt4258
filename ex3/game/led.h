@@ -1,6 +1,9 @@
 #ifndef LED_H
 #define LED_H
 
+/*
+ * The current state of the LEDs.
+ */
 extern char led_setup;
 
 /*

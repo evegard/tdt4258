@@ -1,6 +1,10 @@
 #ifndef BUTTON_H
 #define BUTTON_H
 
+/*
+ * A bit mask of the buttons to ignore (because they have already been
+ * pushed down without being released again).
+ */
 extern int btn_ignore;
 
 /*
