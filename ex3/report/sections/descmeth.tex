@@ -25,7 +25,7 @@ Writing the image file to the card was done using \texttt{dd} on the
 lab computer.
 
 \subsection{Developing the kernel driver}
-
+\label{subsec:developing-the-driver}
 Our kernel driver follows the required steps listed in the compendium
 \cite{comp}. The skeleton code was extended to perform the following
 initialization steps:
@@ -153,3 +153,97 @@ returned.
 \texttt{led.c} and \texttt{led.h} implements LED control. As with the
 button support, the initialization step is to open the
 \texttt{/dev/stkboard} device.
+
+\subsubsection{Implementing the game logic}
+\label{subsec:game-logic}
+The game logic itself is implemented in \texttt{scorched\_land.c} and the
+API created with documentation is implemented in
+\texttt{scorched\_land.h}. By separating game logic from the
+STK1000-specific implementation, one can implement the game on another
+platform without the need to reimplement the game logic. This made it
+possible to make a simple terminal version of the game with colours for
+linux to debug the game logic, without the need of a GUI on the STK1000
+board. 
+
+As there were no specifications on how the game logic should work, we
+decided to make a game logic specification before implementing the game.
+We ended up with the following specifications on how the game should
+work:
+\begin{itemize}
+    \item The game is grid-based where the soldier uses 1x1 space, and
+            begins initially in the lower left corner.
+    \item The tank uses 2x2 space and is placed in the top right corner.
+    \item The soldier is able to move in the directions north, west, up
+            and down if and only if the tile the soldier wants to move
+            to is within the grid size and the tile is not scorched land.
+    \item The tank is stationary, and can shoot a gun which will scorch
+            the land. The player gives an angle and a strenght on the
+            shot, and the game will calculate where the shot ends up at.
+    \item The soldier will win if he gets to a tile which is
+            occupied by the tank.
+    \item The tank will win if he hits the soldier, or if the hit makes
+            it impossible to reach the tank for the soldier.
+\end{itemize}
+
+We decided to omit details such as grid size and whether the game is
+turn based or real-time in the specifications, and instead make it
+possible to change these choices at compile-time.
+
+After we had decided on specification details, we implemented the
+API in the \texttt{scorched\_land.h} file, with explanation on what
+parameters each function takes, what the function does, and what you can
+expect from the return parameter. When we finished the API, we started
+implementing the game in the \texttt{scorched\_land.c} file.
+
+The game is initialized by running the \texttt{game\_init} function.
+This will reset all variables related to the game in case these values
+have not been previously initialized, or if one has already played a
+game and wants to start over. To let the tank shoot a bullet, one calls
+the function \texttt{game\_shoot\_bullet} with two integers: One
+denoting the direction in degrees the bullet is supposed to go, the
+second denoting how much power to use - which determines how far the
+bullet goes.
+
+\input{figures/pos-code}
+
+Calculating where the bullet lands is done by the code snippet shown in
+figure \ref{lst:pos-code}. We first convert the degrees to radians. We
+then find out how far on the x- and y-axis the shot goes by calculating
+the sine and cosine of the radians we just calculated. This is in turn
+multiplied by a previously calculated factor
+\texttt{GAME\_STRENGTH\_SCALE} and the strength given as parameter, and
+then rounded down to an integer. Finally, we flip the x-position to
+let the shot go from the correct corner.
+
+\texttt{GAME\_STRENGTH\_SCALE} is calculated by taking the longest total
+distance a shot can go divided by \texttt{GAME\_MAX\_STRENGTH}, the
+maximal power one can shoot with.  The longest total distance a shot can
+go is $\sqrt{W^2 + H^2}$ where $W = $\texttt{GAME\_WIDTH} and $H =$
+\texttt{GAME\_HEIGHT} length.  By multiplying by this factor, we ensure
+that the tank is able to hit any tile on the game regardless of maximal
+strength and game dimensions. 
+
+\input{figures/pos-calc}
+
+The function \texttt{game\_move\_player} will move the soldier with the
+specified direction you want the soldier to go to, if possible. The
+function will check whether the position is ok to move to, and if so,
+will move the soldier from its current position to its next. Finally,
+the functions returns a reasonable response which gives the GUI
+possibility to properly give error messages if wanted.
+
+After the initial implementation, a terminal version of the game was
+created to test the functionality and check that all worked as intended.
+The terminal version can be compiled and run by running the command 
+\verb|make test && test/sc_land| in the \texttt{game} folder, or
+through \verb|make && ./sc_land| in the \texttt{game/test} folder.
+
+\input{figures/terminal-screenshot-0}
+
+By implementing a terminal version, we could test the implementation
+much faster and debug with the "GNU Debugger" available, which give a
+much better debug support than the STK1000 board does. From the
+implementaion, we found and solved bugs in regards to correctly placing
+scorched land from a bullet shot. We also found out that we forgot to
+flip the x-axis, and implemented the code needed to flip it.
+
