@@ -26,6 +26,7 @@ lab computer.
 
 \subsection{Developing the kernel driver}
 \label{subsec:developing-the-driver}
+
 Our kernel driver follows the required steps listed in the compendium
 \cite{comp}. The skeleton code was extended to perform the following
 initialization steps:
@@ -40,11 +41,6 @@ initialization steps:
     \item Register the character device with \texttt{cdev\_add}.
 \end{itemize}
 
-Upon read requests to the device, the driver returns a single byte
-representing the current data values on the button pins. Upon write
-requests, the driver reads a single byte and updates the eight LED pins
-accordingly.
-
 As the PIO C port is reserved for other uses in this exercise, we needed
 to use the higher bits of the PIO B port for the LEDs. However, the
 mapping between bit positions in this I/O register and the physical pins
@@ -53,6 +49,19 @@ register bits with some extra logic. The code for this is shown in
 figure \ref{lst:io_mapping}.
 
 \input{figures/io_mapping}
+
+Upon read requests to the device, the driver returns a single byte
+representing the current data values on the button pins. For instance
+would byte value 129 (\texttt{1000 0001}) mean that buttons 7 and 0 are
+pushed.
+
+Upon write requests, the driver reads a single byte and updates the
+eight LED pins accordingly. For example, if you write the byte value 66
+(\texttt{0100 0010}) to the device, then LED 6 and 1 will be lit, while
+the others will be turned off if they aren't already off. Notice that
+there's no way to read the LEDs from the device, as this was not a
+specification requirement. To do that in a program, we will have to keep
+track of the current configuration of the LEDs ourselves.
 
 The ``protocol'' described for our device driver is thus very simple --
 a single byte is the unit for both read and write operations. This
@@ -67,6 +76,8 @@ game logic and the hardware interfacing (screen, sound, buttons and
 LEDs) were developed in parallel. Afterwards, the user interface logic
 connecting the two halves was developed. This has led to a code base
 with a clean seperation of the different parts.
+
+\input{figures/gamescr0}
 
 \subsubsection{Rendering to the screen}
 
@@ -89,6 +100,8 @@ The function \texttt{screen\_show\_buffer} shows the back buffer on the
 screen. In addition, there are several other \texttt{screen\_[...]}
 functions that mainly deal with drawing shapes like filled rectangles
 and lines.
+
+\input{figures/gamescr1}
 
 \subsubsection{Importing image files for graphics}
 
@@ -121,6 +134,8 @@ need is the image height and width, both given in two bytes. We solve
 this by swapping the upper eight and lower eight bits through
 bit-shifting, as can be seen in the \texttt{image\_load} function in
 \texttt{image.c}
+
+\input{figures/gamescr2}
 
 \subsubsection{Playing sound effects}
 
@@ -166,6 +181,8 @@ from the function, the function will no longer repeat this as long as
 the button is kept pushed down. This is achieved by maintaining a
 \texttt{btn\_ignore} variable that masks out button pushes already
 returned.
+
+\input{figures/gamescr3}
 
 \subsubsection{Controlling LEDs}
 
@@ -269,7 +286,7 @@ implementaion, we found and solved bugs in regards to correctly placing
 scorched land tiles from a bullet shot. We also found out that we forgot to
 flip the x-position, and implemented the code needed to flip it.
 
-\subsection{Implementing the user interface}
+\subsubsection{Implementing the user interface}
 
 With all the low level support functions in place, as well as the game
 logic itself, a user interface tying all this together was needed. The
@@ -289,3 +306,9 @@ states:
 
 The user interface runs in an infinite loop, rendering to the screen,
 reading input, controlling the sound and updating the game state.
+
+Impressions of the user interface are shown in figures
+\ref{fig:gamescr0}, \ref{fig:gamescr1}, \ref{fig:gamescr2},
+\ref{fig:gamescr3} and \ref{fig:gamescr4} throughout the report.
+
+\input{figures/gamescr4}
