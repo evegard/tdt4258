@@ -75,9 +75,9 @@ and \texttt{screen.h}. An initialization function opens the framebuffer
 device at \texttt{/dev/fb0} and uses memory mapping to allow this device
 to be used as a regular C array. An in-memory array of the same size is
 allocated to function as a back buffer. This is to implement double
-buffering, as the image flickers otherwise.
+buffering, as the image will flicker otherwise.
 
-A custom C structure, \texttt{color\_t}, is defined, that abstracts away
+A custom C structure \texttt{color\_t} is defined, that abstracts away
 the makeup of the pixels in the framebuffer array as colors with red,
 green and blue components. To plot a pixel, the macro
 \texttt{screen\_put} is used (see figure \ref{lst:screen_put}). This is
@@ -86,27 +86,41 @@ implemented as a macro for efficiency reasons.
 \input{figures/screen_put}
 
 The function \texttt{screen\_show\_buffer} shows the back buffer on the
-screen. In addition, there are several other \texttt{screen} functions
-that mainly deal with drawing shapes like filled rectangles and lines.
+screen. In addition, there are several other \texttt{screen\_[...]}
+functions that mainly deal with drawing shapes like filled rectangles
+and lines.
 
 \subsubsection{Importing image files for graphics}
 
 For our graphics format, we chose uncompressed 24-bit \emph{Truevision
 TGA} format (also known as TARGA format) for its ease of implementation
 and because it is not heavily patented. Truevision TGA is a raster
-graphics file format with options for 8 to 32 bits of precision per pixel, with up to 24 bits of RGB color and an additional 8 bit alpha channel, and offers the option of lossless RLE compression. Truevision TGA files have an 18 byte header, of which the last 10 bytes are the image specification. Additional image information (including metadata) may be added after the header if desired, but as we had no use of this, we chose not to.
+graphics file format with options for 8 to 32 bits of precision per
+pixel, with up to 24 bits of RGB color and an additional 8 bit alpha
+channel, and it offers the option of lossless RLE compression.
+Truevision TGA files have an 18 byte header, of which the last 10 bytes
+are the image specification.
 
-We extracted the image dimensions and format from this to find the exact
-location and size of the image data, and discarded the other
-information. We then rendered the raw image data directly, pixel for pixel, as can be seen in \texttt{image.c}, with one exception. We wished to make partially transparent images to make overlaying seamless (as in the case of the little soldier and the tank), but exporting 32-bit Truevision TGA images with an 8-bit alpha channel proved difficult with the available tools. Instead, we substituted a bright purple colour not used elsewhere (printer's magenta, hexadecimal \texttt{FF00FF}) for the transparency, and ignored this during rendering, as can be seen in the \texttt{image\_draw} function in \texttt{image.c}.
+We extract the image dimensions and format from this header to find the
+exact location and size of the image data, and discard the other
+information. We then render the raw image data directly, pixel for
+pixel, as can be seen in \texttt{image.c}, with one exception. We wished
+to make partially transparent images to make overlaying seamless (as in
+the case of the little soldier and the tank), but exporting 32-bit
+Truevision TGA images with an 8-bit alpha channel proved difficult with
+the available tools. Instead, we substituted a bright purple colour not
+used elsewhere (printer's magenta, hexadecimal \texttt{FF00FF}) for the
+transparency, and ignore this during rendering, as can be seen in the
+\texttt{image\_draw} function in \texttt{image.c}.
 
 We encountered one problem: Truevision TGA format is little-endian, and
 Linux on AVR32 is big-endian. Thankfully, the scope of the problem was
 limited to the header of the TGA file, as the image data is given in
 individual bytes. In our case, the only multiple-byte information we
-needed was the image height and width, both given in two bytes. We
-solved this by swapping the upper eight and lower eight bits through
-bit-shifting, as can be seen in the \texttt{image\_load} function in \texttt{image.c}
+need is the image height and width, both given in two bytes. We solve
+this by swapping the upper eight and lower eight bits through
+bit-shifting, as can be seen in the \texttt{image\_load} function in
+\texttt{image.c}
 
 \subsubsection{Playing sound effects}
 
@@ -122,7 +136,9 @@ To make playback simple, we exported the sounds in raw sample format
 with parameters that matched those of the \texttt{/dev/dsp} device. To
 play sounds, we then only need to write the samples from the sound files
 directly into \texttt{/dev/dsp}. This is implemented in \texttt{sound.c}
-and \texttt{sound.h}. As inconsistencies in sampling rates became apparent during our test runs, we edited the sound clips to provide consistent sampling rates.
+and \texttt{sound.h}. As inconsistencies in sampling rates became
+apparent during our test runs, we edited the sound clips to provide
+consistent sampling rates.
 
 \subsubsection{Reading buttons}
 
@@ -153,14 +169,14 @@ button support, the initialization step is to open the
 
 \subsubsection{Implementing the game logic}
 \label{subsec:game-logic}
-The game logic itself is implemented in \texttt{scorched\_land.c} and the
-API created with documentation is implemented in
+
+The game logic itself is implemented in \texttt{scorched\_land.c} and
+the API created with documentation is implemented in
 \texttt{scorched\_land.h}. By separating game logic from the
 STK1000-specific implementation, one can implement the game on another
 platform without the need to reimplement the game logic. This made it
-possible to make a simple terminal version of the game with colours for
-linux to debug the game logic, without the need of a GUI on the STK1000
-board. 
+possible to make a simple terminal version of the game for Linux to
+debug the game logic, without the need of a GUI on the STK1000 board. 
 
 As there were no specifications on how the game logic should work, we
 decided to make a game logic specification before implementing the game.
@@ -243,4 +259,3 @@ much better debugging support than the STK1000 board does. From the
 implementaion, we found and solved bugs in regards to correctly placing
 scorched land tiles from a bullet shot. We also found out that we forgot to
 flip the x-axis, and implemented the code needed to flip it.
-
