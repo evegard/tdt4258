@@ -1,0 +1,27 @@
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}
+
+\draw[step=0.75cm,color=green!50!black,very thin] (0,-3.75) grid (12,0);
+
+\draw[triangle 45-,color=red, thick]
+    (330:5.55) node[above=7pt] {$(x_i,y_i)$} -- 
+    (0,0) node[midway,sloped,above,color=black]{$r$};
+
+\draw[fill=red!20,draw=red!50!black] 
+    (0,0) -- (0.75, 0) arc (0:-30:0.75) -- cycle; 
+
+\draw[color=red!50!black]
+    (0,0) node[right=0.9cm, below=0.045cm]{{\small $\alpha$}};
+
+\draw[triangle 45-,color=blue, thick] 
+    (12,0) ++(210:5.55cm) node[above=7pt]{$(x_f,y_i)$}
+               -- (12,0) node[midway,sloped,above,color=black]{$r$};
+
+\end{tikzpicture}
+\caption{Calculating the landing position of a gun shot. The red arrow
+represents the calculated values before flipping the x-position, and the
+blue arrow represents the calculated values afterwards.}
+\label{fig:pos-calc}
+\end{figure}
+

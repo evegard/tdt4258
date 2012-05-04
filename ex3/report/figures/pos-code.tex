@@ -1,0 +1,17 @@
+\begin{figure}[ht]
+\centering
+\lstset{language=C,basicstyle=\ttfamily,numbers=left,firstnumber=42}
+\begin{lstlisting}
+    double radians = ( direction ) * ( M_PI / 180 ),
+           x_multiplier = cos ( radians ),
+           y_multiplier = sin ( radians ),
+           scaled_strength = strength *  GAME_STRENGTH_SCALE;
+
+    int    x = (int) ( x_multiplier * scaled_strength ),
+           y = (int) ( y_multiplier * scaled_strength );
+    /* Flip the x-position. */
+    x = GAME_WIDTH - 1 - x;
+\end{lstlisting}
+\caption{Logic in \texttt{game/scorched\_land.c} to calculate which tile to hit.}
+\label{lst:pos-code}
+\end{figure}
