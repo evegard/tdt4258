@@ -5,7 +5,6 @@ and auditory testing to check that image rendering and sound rendering
 were accurate, as well as component testing of individual code
 components.
 
-
 \subsection{Buttons and LEDs}
 As the button and LED implementation from assingments 1 and 2 was more
 or less complete, we tested it first, as it only needed minor
@@ -28,13 +27,18 @@ rendering was successful, but flickered badly.  Double-buffering seems
 to have solved the flickering problem. % TODO: Expand this.
 
 \subsection{Sound}
-% TODO: Write this.
+Seeing as how we'd already implemented sound in the previous assignment, implementing it this time was a fairly simple job. We did not start the sound module until after we were told about the ALSA muting problem, so implementing sound was fairly uneventful. To check whether the sounds performed correctly, they were played back on the STK1000 board, as well as on a laptop computer to compare. It soon became apparent that the files were being played back roughly twice as fast as they should. A quick check of the sampling rate of the files and the sound settings in \texttt{/dev/dsp} showed that the sound settings had a double rate. Once this was fixed, the sound performed correctly.
+
 \subsection{Game logic}
 Seeing as how testing the game logic on the board required near-perfect
 functionality from the STK1000 board, we decided to make a simple
 terminal version of the game, using the same game logic, as described in
-\ref{subsec:game-logic}. 
-% TODO: Expand this with notes from talking to JN.
-
+\ref{subsec:game-logic}. Additionally, terminal testing allowed for making 
+changes in quick succession without being hampered by testing the logic on the STK1000 board.
+Using this tool, we performed successive tests and improvements. All tests were performed by doing a normal run of the test program and comparing it to the logic rules laid out in \ref{subsec:game-logic}. We started out by making sure the shooting function worked as it should.
+Our first test failed. The shots appeared to originate from the wrong corner in our first test run of the game. We rectified this by flipping the calculated x position. 
+Once this was done, we ran a second test. It too, failed. Although the first problem was resolved, we discovered that it was impossible to hit the rightmost tiles in the grid. After some searching, we discovered that we flipped the x position before we cast the floating point number to an int, leading to it rounding the wrong way, excluding a whole column of tiles. We fixed this by casting to an int first, and then flipping the x position.
+At this point, the shooting function performed as it should, and we ran a third test. It failed, because the tank would be declared winner after only one shot, even though the proper winning conditions were not met. A short investigation revealed that the depth-first search that tests for whether there is a path between the soldier and the tank (no path means that the tank has won) had a simple logical error, where TRUE and FALSE had been inverted. We fixed this, and tested again.
+Our fourth test was successful, as the game logic performed as expected and according to the rules laid out.
 \subsection{Complete test}
-
+% Oi, her bør det kanskje skrives noe?
